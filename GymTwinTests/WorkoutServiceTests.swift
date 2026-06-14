@@ -223,10 +223,12 @@ final class WorkoutServiceTests: XCTestCase {
     }
 
     func testStatistics_workoutsThisWeek_countsCorrectly() throws {
-        // Arrange
+        // Arrange — pin both "this week" workouts inside the current ISO week to
+        // avoid a boundary flake when today is the first day of the week.
         let id = UUID()
+        let weekStart = Calendar.current.dateInterval(of: .weekOfYear, for: Date())!.start
         insertWorkout(date: Date(), machineID: id, machineName: "X", sets: [(40, 10)])
-        insertWorkout(date: daysAgo(1), machineID: id, machineName: "X", sets: [(40, 10)])
+        insertWorkout(date: weekStart.addingTimeInterval(3600), machineID: id, machineName: "X", sets: [(40, 10)])
         insertWorkout(date: daysAgo(30), machineID: id, machineName: "X", sets: [(40, 10)]) // outside week
 
         // Act
