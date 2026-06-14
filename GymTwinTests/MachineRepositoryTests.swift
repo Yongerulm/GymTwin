@@ -11,7 +11,7 @@ final class MachineRepositoryTests: XCTestCase {
 
     // MARK: - allMachines
 
-    func testAllMachines_bundledSeed_returnsNineMachines() async throws {
+    func testAllMachines_bundledSeed_returns15Machines() async throws {
         // Arrange
         let repo = LocalMachineRepository(overridesURL: nil)
 
@@ -19,7 +19,7 @@ final class MachineRepositoryTests: XCTestCase {
         let all = try await repo.allMachines()
 
         // Assert
-        XCTAssertEqual(all.count, 9,
+        XCTAssertEqual(all.count, 15,
                        "The bundled machines.json contains exactly 9 machine definitions.")
     }
 
@@ -71,7 +71,7 @@ final class MachineRepositoryTests: XCTestCase {
         let results = try await repo.search("")
 
         // Assert
-        XCTAssertEqual(results.count, 9,
+        XCTAssertEqual(results.count, 15,
                        "An empty search query should return all machines.")
     }
 
