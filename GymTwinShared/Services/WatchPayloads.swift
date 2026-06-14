@@ -51,6 +51,7 @@ struct WorkoutSetDTO: Codable, Identifiable, Hashable {
     var weight: Double
     var repetitions: Int
     var timestamp: Date
+    var typeRaw: String = WorkoutSetType.working.rawValue
 }
 
 // MARK: - Model → DTO
@@ -111,7 +112,8 @@ extension WorkoutDTO {
                     weight: setDTO.weight,
                     repetitions: setDTO.repetitions,
                     timestamp: setDTO.timestamp,
-                    sortIndex: setIndex
+                    sortIndex: setIndex,
+                    type: WorkoutSetType(rawValue: setDTO.typeRaw) ?? .working
                 )
             }
             return exercise

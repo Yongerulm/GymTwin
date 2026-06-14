@@ -15,13 +15,14 @@ struct WorkoutSetEntryView: View {
     let lastReps: Int
     /// Optional — when present, drives the AI suggestion hint.
     var machineID: UUID?
-    let onAdd: (Double, Int) -> Void
+    let onAdd: (Double, Int, WorkoutSetType) -> Void
     let onCancel: () -> Void
 
     @Environment(\.modelContext) private var modelContext
 
     @State private var weight: Double
     @State private var reps: Double
+    @State private var setType: WorkoutSetType = .working
     @State private var didLog = false
     @State private var aiSuggestion: SetRecommendation?
     /// The machine's predefined settings (Seat Height, etc.) for reference.
@@ -32,7 +33,7 @@ struct WorkoutSetEntryView: View {
         lastWeight: Double,
         lastReps: Int,
         machineID: UUID? = nil,
-        onAdd: @escaping (Double, Int) -> Void,
+        onAdd: @escaping (Double, Int, WorkoutSetType) -> Void,
         onCancel: @escaping () -> Void
     ) {
         self.exerciseName = exerciseName
@@ -100,13 +101,35 @@ struct WorkoutSetEntryView: View {
             }
             .padding(.horizontal, DS.Spacing.lg)
 
+            // Set type selector
+            Menu {
+                ForEach(WorkoutSetType.allCases, id: \.self) { t in
+                    Button(t.label) { setType = t }
+                }
+            } label: {
+                HStack(spacing: DS.Spacing.xs) {
+                    Image(systemName: "tag.fill").font(.caption)
+                    Text(setType.label)
+                    Spacer()
+                    Image(systemName: "chevron.up.chevron.down").font(.caption)
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DS.Palette.accent)
+                .padding(.vertical, DS.Spacing.sm)
+                .padding(.horizontal, DS.Spacing.md)
+                .background(DS.Palette.surfaceElevated, in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+            }
+            .padding(.top, DS.Spacing.md)
+            .padding(.horizontal, DS.Spacing.lg)
+            .accessibilityLabel("Set type: \(setType.label)")
+
             Spacer(minLength: DS.Spacing.xl)
 
             // Actions
             VStack(spacing: DS.Spacing.sm) {
                 Button {
                     didLog = true
-                    onAdd(weight, Int(reps))
+                    onAdd(weight, Int(reps), setType)
                 } label: {
                     Label("Log Set", systemImage: "plus.circle.fill")
                 }
@@ -209,7 +232,7 @@ struct WorkoutSetEntryView: View {
         exerciseName: "Chest Press",
         lastWeight: 57.5,
         lastReps: 10,
-        onAdd: { w, r in print("Logged \(w) kg × \(r)") },
+        onAdd: { w, r, _ in print("Logged \(w) kg × \(r)") },
         onCancel: {}
     )
     .preferredColorScheme(.dark)
@@ -226,7 +249,7 @@ struct WorkoutSetEntryView: View {
         lastWeight: 55.0,
         lastReps: 10,
         machineID: UUID(),
-        onAdd: { w, r in print("Logged \(w) kg × \(r)") },
+        onAdd: { w, r, _ in print("Logged \(w) kg × \(r)") },
         onCancel: {}
     )
     .modelContainer(container)

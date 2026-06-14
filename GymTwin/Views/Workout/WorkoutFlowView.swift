@@ -63,8 +63,8 @@ struct WorkoutFlowView: View {
                 lastWeight: target.lastWeight,
                 lastReps: target.lastReps,
                 machineID: target.machineID
-            ) { weight, reps in
-                model.addSet(weight: weight, reps: reps, toExerciseAt: target.exerciseIndex)
+            ) { weight, reps, type in
+                model.addSet(weight: weight, reps: reps, type: type, toExerciseAt: target.exerciseIndex)
                 setEntryTarget = nil
             } onCancel: {
                 setEntryTarget = nil
@@ -652,6 +652,14 @@ private struct LoggedSetRow: View {
                 .frame(width: 44, alignment: .leading)
             Text(formattedSet)
                 .font(.body.weight(.semibold).monospacedDigit())
+            if let tag = set.type.tag {
+                Text(tag)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(DS.Palette.accentSecondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(DS.Palette.accentSecondary.opacity(0.15), in: Capsule())
+            }
             Spacer()
             Button(role: .destructive, action: onRemove) {
                 Image(systemName: "minus.circle.fill")

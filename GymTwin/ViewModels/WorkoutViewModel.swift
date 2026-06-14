@@ -9,11 +9,13 @@ struct DraftSet: Identifiable {
     let id: UUID
     var weight: Double
     var reps: Int
+    var type: WorkoutSetType
 
-    init(id: UUID = UUID(), weight: Double, reps: Int) {
+    init(id: UUID = UUID(), weight: Double, reps: Int, type: WorkoutSetType = .working) {
         self.id = id
         self.weight = weight
         self.reps = reps
+        self.type = type
     }
 }
 
@@ -91,7 +93,8 @@ final class WorkoutViewModel {
                         id: draftSet.id,
                         weight: draftSet.weight,
                         repetitions: draftSet.reps,
-                        timestamp: startDate.addingTimeInterval(Double(setIndex))
+                        timestamp: startDate.addingTimeInterval(Double(setIndex)),
+                        typeRaw: draftSet.type.rawValue
                     )
                 }
             )
@@ -175,9 +178,9 @@ final class WorkoutViewModel {
     // MARK: - Set management
 
     /// Append a set to the exercise at `index`.
-    func addSet(weight: Double, reps: Int, toExerciseAt index: Int) {
+    func addSet(weight: Double, reps: Int, type: WorkoutSetType = .working, toExerciseAt index: Int) {
         guard index < exercises.count else { return }
-        let set = DraftSet(weight: weight, reps: reps)
+        let set = DraftSet(weight: weight, reps: reps, type: type)
         exercises[index].sets.append(set)
     }
 
@@ -186,7 +189,7 @@ final class WorkoutViewModel {
     @discardableResult
     func repeatLastSet(forExerciseAt index: Int) -> DraftSet? {
         guard index < exercises.count, let last = exercises[index].sets.last else { return nil }
-        let copy = DraftSet(weight: last.weight, reps: last.reps)
+        let copy = DraftSet(weight: last.weight, reps: last.reps, type: last.type)
         exercises[index].sets.append(copy)
         return copy
     }
