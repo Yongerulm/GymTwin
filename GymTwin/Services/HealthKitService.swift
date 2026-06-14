@@ -32,6 +32,8 @@ final class HealthKitService {
         if let fat  = HKQuantityType.quantityType(forIdentifier: .bodyFatPercentage)  { set.insert(fat) }
         if let step = HKQuantityType.quantityType(forIdentifier: .stepCount)          { set.insert(step) }
         if let vo2  = HKQuantityType.quantityType(forIdentifier: .vo2Max)             { set.insert(vo2) }
+        if let rhr  = HKQuantityType.quantityType(forIdentifier: .restingHeartRate)   { set.insert(rhr) }
+        if let hrv  = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN) { set.insert(hrv) }
         if let sleep = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)       { set.insert(sleep) }
         return set
     }
@@ -172,6 +174,16 @@ final class HealthKitService {
         let unit = HKUnit.literUnit(with: .milli)
             .unitDivided(by: HKUnit.gramUnit(with: .kilo).unitMultiplied(by: .minute()))
         return await latestQuantity(.vo2Max, unit: unit)
+    }
+
+    /// Most-recent resting heart rate in bpm.
+    func restingHeartRate() async -> Double? {
+        await latestQuantity(.restingHeartRate, unit: HKUnit.count().unitDivided(by: .minute()))
+    }
+
+    /// Most-recent heart-rate variability (SDNN) in milliseconds.
+    func latestHRV() async -> Double? {
+        await latestQuantity(.heartRateVariabilitySDNN, unit: .secondUnit(with: .milli))
     }
 
     private func latestQuantity(

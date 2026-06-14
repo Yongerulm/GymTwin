@@ -41,6 +41,15 @@ final class ProgressViewModel {
     /// Most-recent VO₂ max in ml/(kg·min), nil when unavailable.
     private(set) var vo2Max: Double?
 
+    /// Heart-rate variability (SDNN, ms), nil when unavailable.
+    private(set) var hrv: Double?
+
+    /// HRV-led daily readiness score 0–100.
+    private(set) var readiness: Int = 0
+
+    /// Banded readiness, for the dashboard recommendation line.
+    var readinessBand: ReadinessBand { ReadinessBand.from(readiness) }
+
     // MARK: - Internal
 
     private var context: ModelContext?
@@ -75,16 +84,18 @@ final class ProgressViewModel {
         guard hk.isAvailable else { return }
         await hk.requestAuthorization()
 
-        async let stepsResult   = hk.latestSteps()
-        async let sleepResult   = hk.lastNightSleepHours()
-        async let hrResult      = hk.latestHeartRate()
-        async let vo2Result     = hk.latestVO2Max()
+        async let stepsResult = hk.latestSteps()
+        async let sleepResult = hk.lastNightSleepHours()
+        async let restResult  = hk.restingHeartRate()
+        async let hrvResult   = hk.latestHRV()
+        async let vo2Result   = hk.latestVO2Max()
 
-        let (s, sl, hr, v) = await (stepsResult, sleepResult, hrResult, vo2Result)
-        steps       = s
-        sleepHours  = sl
-        restingHR   = hr.map { Int($0.rounded()) }
-        vo2Max      = v
+        let (s, sl, rhr, h, v) = await (stepsResult, sleepResult, restResult, hrvResult, vo2Result)
+        steps      = s
+        sleepHours = sl
+        restingHR  = rhr.map { Int($0.rounded()) }
+        hrv        = h
+        vo2Max     = v
         updateRecoveryScore()
     }
 
@@ -99,6 +110,12 @@ final class ProgressViewModel {
             avgSessionMinutes: avgMinutes,
             sleepHours: sleepHours,
             restingHR: restingHR
+        )
+        readiness = RecoveryService.readiness(
+            hrvMs: hrv,
+            restingHR: restingHR,
+            sleepHours: sleepHours,
+            workoutsLast7Days: statistics.workoutsThisWeek
         )
     }
 

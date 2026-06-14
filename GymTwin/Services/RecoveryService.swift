@@ -116,3 +116,68 @@ struct RecoveryService {
         }
     }
 }
+
+// MARK: - Readiness (HRV-led daily score)
+
+/// How recovered the user is today, banded for a clear recommendation.
+enum ReadinessBand: String, Sendable {
+    case low, moderate, high, peak
+
+    static func from(_ score: Int) -> ReadinessBand {
+        switch score {
+        case ..<40: return .low
+        case 40..<60: return .moderate
+        case 60..<80: return .high
+        default: return .peak
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .low: return "Take it easy"
+        case .moderate: return "Moderate"
+        case .high: return "Ready"
+        case .peak: return "Peak"
+        }
+    }
+
+    /// Calm, precise coaching line — never hype.
+    var recommendation: String {
+        switch self {
+        case .low: return "Recovery is low. Prioritise rest, mobility or a light session today."
+        case .moderate: return "You're partly recovered. Keep the intensity moderate and stop a rep short."
+        case .high: return "You're recovered. Train as planned and chase your targets."
+        case .peak: return "Excellent recovery. A good day to push for a personal record."
+        }
+    }
+}
+
+extension RecoveryService {
+    /// HRV-led daily readiness in `0...100`, blending heart-rate variability,
+    /// resting heart rate, sleep and recent training load. Degrades gracefully
+    /// when inputs are nil (neutral assumptions).
+    static func readiness(
+        hrvMs: Double?,
+        restingHR: Int?,
+        sleepHours: Double?,
+        workoutsLast7Days: Int
+    ) -> Int {
+        let raw = hrvComponent(ms: hrvMs)                                       // 0...40
+            + heartRateComponent(bpm: restingHR) / 20 * 25                      // 0...25
+            + sleepComponent(hours: sleepHours) / 30 * 25                       // 0...25
+            + trainingComponent(sessions: workoutsLast7Days, avgMinutes: nil) / 50 * 10 // 0...10
+        return max(0, min(100, Int(raw.rounded())))
+    }
+
+    /// HRV (SDNN, ms) → 0...40. Higher variability signals better recovery.
+    /// Absolute heuristic (no personal baseline yet); nil → neutral.
+    static func hrvComponent(ms: Double?) -> Double {
+        guard let hrv = ms else { return 24 }
+        switch hrv {
+        case ..<20: return hrv / 20 * 16          // 0...16
+        case 20..<40: return 16 + (hrv - 20) / 20 * 12   // 16...28
+        case 40..<70: return 28 + (hrv - 40) / 30 * 10   // 28...38
+        default: return 40
+        }
+    }
+}

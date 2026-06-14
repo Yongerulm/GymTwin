@@ -32,6 +32,7 @@ struct ProgressDashboardView: View {
         ScrollView {
             LazyVStack(spacing: DS.Spacing.xl) {
                 topMetricsSection
+                readinessSection
                 recoverySection
                 healthSection
                 weeklyVolumeSection
@@ -97,6 +98,73 @@ struct ProgressDashboardView: View {
     }
 
     // MARK: - Recovery ring
+
+    // MARK: - Readiness (HRV-led)
+
+    private var readinessSection: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            PremiumSectionHeader("Today's Readiness")
+            SurfaceCard {
+                VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                    HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.sm) {
+                        Text("\(model.readiness)")
+                            .font(.system(size: 44, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .contentTransition(.numericText())
+                            .foregroundStyle(readinessColor)
+                        Text("/ 100").font(.headline).foregroundStyle(.secondary)
+                        Spacer()
+                        Text(model.readinessBand.title)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(readinessColor)
+                            .padding(.horizontal, DS.Spacing.md)
+                            .padding(.vertical, 6)
+                            .background(readinessColor.opacity(0.16), in: Capsule())
+                    }
+
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.white.opacity(0.08))
+                            Capsule().fill(readinessColor)
+                                .frame(width: geo.size.width * CGFloat(model.readiness) / 100)
+                        }
+                    }
+                    .frame(height: 8)
+
+                    Text(model.readinessBand.recommendation)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    if model.hrv != nil || model.restingHR != nil || model.sleepHours != nil {
+                        HStack(spacing: DS.Spacing.xl) {
+                            if let hrv = model.hrv { readinessStat("HRV", "\(Int(hrv)) ms") }
+                            if let rhr = model.restingHR { readinessStat("Resting HR", "\(rhr) bpm") }
+                            if let sleep = model.sleepHours { readinessStat("Sleep", String(format: "%.1f h", sleep)) }
+                        }
+                        .padding(.top, DS.Spacing.xs)
+                    }
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Readiness \(model.readiness) of 100, \(model.readinessBand.title). \(model.readinessBand.recommendation)")
+        }
+    }
+
+    private var readinessColor: Color {
+        switch model.readinessBand {
+        case .low: return DS.Palette.warning
+        case .moderate: return DS.Palette.record
+        case .high: return DS.Palette.success
+        case .peak: return DS.Palette.accent
+        }
+    }
+
+    private func readinessStat(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value).font(.subheadline.weight(.bold)).monospacedDigit()
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+    }
 
     private var recoverySection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
