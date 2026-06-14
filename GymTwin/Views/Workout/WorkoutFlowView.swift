@@ -18,6 +18,11 @@ struct WorkoutFlowView: View {
     @State private var showingRestTimer = false
     @State private var setEntryTarget: SetEntryTarget?
 
+    /// Hands-free mode: keep the NFC reader armed so walking up to a machine
+    /// and tapping the phone loads it — no button press per machine.
+    @State private var continuousScan = true
+    @State private var scanTask: Task<Void, Never>?
+
     var body: some View {
         NavigationStack {
             Group {
@@ -35,11 +40,20 @@ struct WorkoutFlowView: View {
         }
         .task {
             model.bind(modelContext)
+            if !model.isActive { model.start() }
             if let id = initialMachineID {
-                model.start()
                 model.addExerciseByID(id)
             }
+            armContinuousScan()
         }
+        .onChange(of: setEntryTarget?.id) { _, newValue in
+            // When the set-entry sheet closes, re-arm scanning for the next machine.
+            if newValue == nil { armContinuousScan() }
+        }
+        .onChange(of: continuousScan) { _, isOn in
+            if isOn { armContinuousScan() } else { scanTask?.cancel(); scanTask = nil }
+        }
+        .onDisappear { scanTask?.cancel(); scanTask = nil }
         .sheet(item: $setEntryTarget) { target in
             WorkoutSetEntryView(
                 exerciseName: target.exerciseName,
@@ -310,6 +324,18 @@ struct WorkoutFlowView: View {
                 .animation(.default, value: model.elapsedSeconds)
         }
         ToolbarItem(placement: .navigationBarTrailing) {
+            if NFCService.isAvailable {
+                Button {
+                    continuousScan.toggle()
+                } label: {
+                    Image(systemName: continuousScan ? "wave.3.right.circle.fill" : "wave.3.right.circle")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(continuousScan ? DS.Palette.accent : .secondary)
+                }
+                .accessibilityLabel(continuousScan ? "Hands-free scanning on" : "Hands-free scanning off")
+            }
+        }
+        ToolbarItem(placement: .navigationBarTrailing) {
             Button {
                 model.reset()
                 router.endWorkout()
@@ -332,6 +358,25 @@ struct WorkoutFlowView: View {
             return String(format: "%d:%02d:%02d", h, m, s)
         }
         return String(format: "%02d:%02d", m, s)
+    }
+
+    // MARK: - Continuous (hands-free) scanning
+
+    /// Arm the NFC reader so the next machine the user taps loads automatically.
+    /// Re-arms itself after each machine via the `setEntryTarget` change hook.
+    /// No-op in the Simulator (no NFC) — there the manual "Scan" sheet is used.
+    private func armContinuousScan() {
+        guard continuousScan, NFCService.isAvailable, setEntryTarget == nil, scanTask == nil else { return }
+        scanTask = Task {
+            let code = await NFCService().scan()
+            scanTask = nil
+            if let code {
+                await loadScannedMachine(rawCode: code)
+            } else {
+                // The user dismissed the system NFC sheet — leave hands-free mode.
+                continuousScan = false
+            }
+        }
     }
 
     // MARK: - Scan → load machine with predefined weights
