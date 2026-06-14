@@ -199,6 +199,10 @@ struct MachineCard: View {
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFill()
+        } else if let asset = MachineArt.assetName(for: name) {
+            Image(asset)
+                .resizable()
+                .scaledToFill()
         } else {
             ZStack {
                 LinearGradient(

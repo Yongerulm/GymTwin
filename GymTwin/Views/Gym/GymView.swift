@@ -493,6 +493,10 @@ private struct AreaCard: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
+            } else if let asset = MachineArt.assetName(for: machine.name) {
+                Image(asset)
+                    .resizable()
+                    .scaledToFill()
             } else {
                 ZStack {
                     muscleColor.opacity(0.20)
