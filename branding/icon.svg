@@ -1,0 +1,88 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="78%">
+      <stop offset="0%" stop-color="#1d2438"/>
+      <stop offset="55%" stop-color="#11151f"/>
+      <stop offset="100%" stop-color="#07090e"/>
+    </radialGradient>
+    <radialGradient id="halo" cx="50%" cy="42%" r="46%">
+      <stop offset="0%" stop-color="#5b73ff" stop-opacity="0.50"/>
+      <stop offset="60%" stop-color="#7a4cf0" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#7a4cf0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#62a0ff"/>
+      <stop offset="50%" stop-color="#6f78fb"/>
+      <stop offset="100%" stop-color="#a258f7"/>
+    </linearGradient>
+    <linearGradient id="brandV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8fb6ff"/>
+      <stop offset="100%" stop-color="#a258f7"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#halo)"/>
+
+  <!-- octagon frame -->
+  <g filter="url(#glow)">
+    <polygon points="372,150 652,150 874,372 874,652 652,874 372,874 150,652 150,372"
+             fill="none" stroke="url(#brand)" stroke-width="26" stroke-linejoin="round"/>
+  </g>
+  <polygon points="372,150 652,150 874,372 874,652 652,874 372,874 150,652 150,372"
+           fill="none" stroke="url(#brandV)" stroke-width="3" stroke-opacity="0.4"
+           transform="translate(512,512) scale(0.88) translate(-512,-512)"/>
+
+  <!-- twin serpent dragons (right drawn, left mirrored) -->
+  <g filter="url(#glow)" fill="none" stroke="url(#brand)" stroke-width="27"
+     stroke-linecap="round" stroke-linejoin="round">
+    <g id="dragon">
+      <!-- serpentine body curling up the side, head dipping toward centre -->
+      <path d="M 700,650
+               C 772,584 792,468 728,390
+               C 690,344 626,330 580,360
+               C 558,374 550,396 560,414"/>
+      <!-- horn -->
+      <path d="M 706,372 L 762,332" stroke="url(#brandV)" stroke-width="22"/>
+      <!-- mane spikes -->
+      <path d="M 752,452 L 798,470" stroke="url(#brandV)" stroke-width="18"/>
+      <path d="M 730,516 L 772,540" stroke="url(#brandV)" stroke-width="18"/>
+      <!-- tail flick -->
+      <path d="M 700,650 C 712,672 706,690 686,694" stroke-width="20"/>
+      <!-- eye -->
+      <circle cx="612" cy="378" r="12" fill="#08090e" stroke="none"/>
+      <circle cx="616" cy="374" r="4" fill="#dbe7ff" stroke="none"/>
+    </g>
+    <use href="#dragon" transform="translate(1024,0) scale(-1,1)"/>
+  </g>
+
+  <!-- centre spark where the heads meet -->
+  <g transform="translate(512,452)" filter="url(#glow)">
+    <path d="M 0,-30 L 8,-8 L 30,0 L 8,8 L 0,30 L -8,8 L -30,0 L -8,-8 Z" fill="url(#brandV)"/>
+  </g>
+
+  <!-- crossed dumbbells (reinterpreting the crossed rackets) -->
+  <g filter="url(#glow)">
+    <g transform="translate(512,694) rotate(28)">
+      <rect x="-82" y="-9" width="164" height="18" rx="9" fill="url(#brand)"/>
+      <rect x="-74" y="-28" width="17" height="56" rx="6" fill="url(#brand)"/>
+      <rect x="-52" y="-21" width="14" height="42" rx="6" fill="url(#brandV)"/>
+      <rect x="57" y="-28" width="17" height="56" rx="6" fill="url(#brand)"/>
+      <rect x="38" y="-21" width="14" height="42" rx="6" fill="url(#brandV)"/>
+    </g>
+    <g transform="translate(512,694) rotate(-28)">
+      <rect x="-82" y="-9" width="164" height="18" rx="9" fill="url(#brand)"/>
+      <rect x="-74" y="-28" width="17" height="56" rx="6" fill="url(#brand)"/>
+      <rect x="-52" y="-21" width="14" height="42" rx="6" fill="url(#brandV)"/>
+      <rect x="57" y="-28" width="17" height="56" rx="6" fill="url(#brand)"/>
+      <rect x="38" y="-21" width="14" height="42" rx="6" fill="url(#brandV)"/>
+    </g>
+  </g>
+</svg>

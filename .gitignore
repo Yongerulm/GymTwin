@@ -1,0 +1,30 @@
+# ───── Secrets — NEVER commit ─────
+**/.gemini_key
+*.gemini_key
+*.pem
+*.p12
+*.mobileprovision
+
+# ───── macOS ─────
+.DS_Store
+**/.DS_Store
+
+# ───── Xcode: user data & build output (the .xcodeproj itself IS committed) ─────
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+DerivedData/
+build/
+*.xcscmblueprint
+*.xccheckout
+
+# ───── Swift Package Manager ─────
+.swiftpm/
+.build/
+Packages/
+
+# ───── Branding: keep source art, drop scratch/transient files ─────
+branding/icon_raw.png
+branding/**/_contact.png
+branding/pro-test/
+branding/machine-icons/*.svg
