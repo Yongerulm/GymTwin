@@ -496,16 +496,10 @@ private struct AreaCard: View {
             } else {
                 ZStack {
                     muscleColor.opacity(0.20)
-                    if let icon = MachineArt.iconName(for: machine.name) {
-                        Image(icon)
-                            .resizable()
-                            .scaledToFit()
-                            .padding(8)
-                    } else {
-                        Image(systemName: muscleSymbol)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(muscleColor.opacity(0.7))
-                    }
+                    Image(systemName: MachineArt.symbol(for: machine.name) ?? muscleSymbol)
+                        .font(.system(size: 20, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.white.opacity(0.92))
                 }
             }
         }

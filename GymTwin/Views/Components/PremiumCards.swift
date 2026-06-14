@@ -206,16 +206,10 @@ struct MachineCard: View {
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                if let icon = MachineArt.iconName(for: name) {
-                    Image(icon)
-                        .resizable()
-                        .scaledToFit()
-                        .padding(16)
-                } else {
-                    Image(systemName: muscleSymbol)
-                        .font(.title2)
-                        .foregroundStyle(.white.opacity(0.85))
-                }
+                Image(systemName: MachineArt.symbol(for: name) ?? muscleSymbol)
+                    .font(.system(size: 30, weight: .medium))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(.white)
             }
         }
     }
