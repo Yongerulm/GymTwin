@@ -17,6 +17,8 @@ enum PersistenceController {
         Workout.self,
         WorkoutExercise.self,
         WorkoutSet.self,
+        WorkoutPlan.self,
+        PlanExercise.self,
     ])
 
     /// The shared, durable container used by the running apps. Falls back

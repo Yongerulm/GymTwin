@@ -407,16 +407,16 @@ struct SettingsView: View {
 
             SurfaceCard(padding: DS.Spacing.lg) {
                 VStack(spacing: 0) {
-                    NavigationLink(destination: PlanGeneratorView()) {
+                    NavigationLink(destination: PlansListView()) {
                         toolsRow(
                             icon: "calendar.badge.plus",
                             iconTint: DS.Palette.success,
-                            label: "Training Plan",
-                            caption: "Generate a personalised plan"
+                            label: "Training Plans",
+                            caption: "Build plans from your machines"
                         )
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Training Plan generator")
+                    .accessibilityLabel("Training Plans")
 
                     Divider()
                         .padding(.leading, 52)

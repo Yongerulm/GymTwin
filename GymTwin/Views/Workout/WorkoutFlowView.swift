@@ -10,10 +10,13 @@ struct WorkoutFlowView: View {
     @Environment(AppRouter.self) private var router
     @Environment(GymSelection.self) private var gymSelection
     @Query private var gyms: [Gym]
+    @Query private var plans: [WorkoutPlan]
+    @AppStorage("active.plan.id") private var activePlanID: String = ""
 
     @State private var model = WorkoutViewModel()
     @State private var showingMachinePicker = false
-    @State private var showingScan = false
+    @State private var showingManualCode = false
+    @State private var manualCode = ""
     @State private var showingFinishConfirm = false
     @State private var showingRestTimer = false
     @State private var setEntryTarget: SetEntryTarget?
@@ -78,10 +81,19 @@ struct WorkoutFlowView: View {
                 showingMachinePicker = false
             }
         }
-        .sheet(isPresented: $showingScan) {
-            WorkoutScanSheet { code in
+        .alert("Machine code", isPresented: $showingManualCode) {
+            TextField("e.g. sscp", text: $manualCode)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button("Load") {
+                let code = manualCode.trimmingCharacters(in: .whitespaces)
+                manualCode = ""
+                guard !code.isEmpty else { return }
                 Task { await loadScannedMachine(rawCode: code) }
             }
+            Button("Cancel", role: .cancel) { manualCode = "" }
+        } message: {
+            Text("NFC needs a real device — enter a machine code to test the flow.")
         }
         .sheet(isPresented: $showingRestTimer) {
             restTimerSheet
@@ -125,7 +137,7 @@ struct WorkoutFlowView: View {
             .padding(.horizontal, DS.Spacing.lg)
 
             Button {
-                showingScan = true
+                quickScan()
             } label: {
                 Label("Scan Machine", systemImage: "wave.3.right")
             }
@@ -273,15 +285,14 @@ struct WorkoutFlowView: View {
         VStack(spacing: 0) {
             Divider().opacity(0.3)
             HStack(spacing: DS.Spacing.md) {
-                // Scan a machine — the primary in-session way to load equipment.
+                // Minimal NFC scan button — a quick tap loads the next machine.
                 Button {
-                    showingScan = true
+                    quickScan()
                 } label: {
-                    Label("Scan", systemImage: "wave.3.right")
-                        .font(.headline)
+                    Image(systemName: "wave.3.right")
+                        .font(.title3.weight(.semibold))
                         .foregroundStyle(DS.Palette.accent)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, DS.Spacing.lg)
+                        .frame(width: 56, height: 56)
                         .background(
                             DS.Palette.accent.opacity(0.14),
                             in: RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
@@ -414,15 +425,49 @@ struct WorkoutFlowView: View {
         model.addExercise(machine: machine)
         guard let index = model.exercises.firstIndex(where: { $0.machineID == machine.id }) else { return }
 
-        // Pre-fill the predefined weights from the coach (last session / rule).
-        let suggestion = CoachService(context: modelContext).nextSet(forMachineID: machine.id, goal: .muscleGain)
+        // Prefer the active plan's predefined target for this machine; otherwise
+        // the coach's suggestion (last session / rule).
+        let weight: Double
+        let reps: Int
+        if let target = activePlanTarget(for: machine) {
+            weight = target.targetWeight
+            reps = target.targetReps
+        } else {
+            let suggestion = CoachService(context: modelContext).nextSet(forMachineID: machine.id, goal: .muscleGain)
+            weight = suggestion.weight > 0 ? suggestion.weight : 20
+            reps = suggestion.reps
+        }
         setEntryTarget = SetEntryTarget(
             exerciseIndex: index,
             exerciseName: machine.name,
-            lastWeight: suggestion.weight > 0 ? suggestion.weight : 20,
-            lastReps: suggestion.reps,
+            lastWeight: weight,
+            lastReps: reps,
             machineID: machine.id
         )
+    }
+
+    /// Quick NFC scan with no custom window: triggers the system NFC sheet on a
+    /// real device, or a small code prompt in the Simulator.
+    private func quickScan() {
+        if !model.isActive { model.start() }
+        if NFCService.isAvailable {
+            Task {
+                if let code = await NFCService().scan() {
+                    await loadScannedMachine(rawCode: code)
+                }
+            }
+        } else {
+            showingManualCode = true
+        }
+    }
+
+    /// The active plan's target for a machine, matched by id or scanned code.
+    private func activePlanTarget(for machine: Machine) -> PlanExercise? {
+        guard !activePlanID.isEmpty,
+              let plan = plans.first(where: { $0.id.uuidString == activePlanID }) else { return nil }
+        if let byID = plan.target(forMachineID: machine.id) { return byID }
+        if let code = machine.machineCode { return plan.target(forCode: code) }
+        return nil
     }
 
     /// Files a freshly created machine under the active gym, in an area that
@@ -435,92 +480,6 @@ struct WorkoutFlowView: View {
             return area.name.lowercased() == category.lowercased()
         } ?? areas.first
         machine.area = target
-    }
-}
-
-// MARK: - Workout scan sheet
-
-/// Loads a machine into the running workout via NFC, with a manual code field
-/// fallback so it also works in the Simulator (which has no NFC hardware).
-private struct WorkoutScanSheet: View {
-    var onCode: (String) -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @State private var manualCode = ""
-    @State private var isScanning = false
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: DS.Spacing.xl) {
-                Image(systemName: "wave.3.right.circle.fill")
-                    .font(.system(size: 64))
-                    .foregroundStyle(DS.Palette.accentGradient)
-                    .padding(.top, DS.Spacing.xl)
-
-                Text("Hold your iPhone to the machine's NFC tag — its preferred weights load automatically.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, DS.Spacing.xl)
-
-                if NFCService.isAvailable {
-                    Button {
-                        Task {
-                            isScanning = true
-                            let code = await NFCService().scan()
-                            isScanning = false
-                            if let code {
-                                onCode(code)
-                                dismiss()
-                            }
-                        }
-                    } label: {
-                        Label(isScanning ? "Scanning…" : "Scan with NFC", systemImage: "wave.3.right")
-                    }
-                    .buttonStyle(GradientButtonStyle())
-                    .padding(.horizontal, DS.Spacing.xl)
-                    .disabled(isScanning)
-                }
-
-                // Manual fallback (Simulator / tags without NFC).
-                VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                    Text(NFCService.isAvailable ? "Or enter the machine code" : "Enter the machine code")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    HStack(spacing: DS.Spacing.sm) {
-                        TextField("e.g. sscp", text: $manualCode)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .padding(.vertical, DS.Spacing.sm)
-                            .padding(.horizontal, DS.Spacing.md)
-                            .background(
-                                DS.Palette.surfaceElevated,
-                                in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous)
-                            )
-                        Button("Load") {
-                            let code = manualCode.trimmingCharacters(in: .whitespaces)
-                            guard !code.isEmpty else { return }
-                            onCode(code)
-                            dismiss()
-                        }
-                        .font(.headline)
-                        .foregroundStyle(DS.Palette.accent)
-                        .disabled(manualCode.trimmingCharacters(in: .whitespaces).isEmpty)
-                    }
-                }
-                .padding(.horizontal, DS.Spacing.xl)
-
-                Spacer()
-            }
-            .navigationTitle("Scan Machine")
-            .navigationBarTitleDisplayMode(.inline)
-            .background(GymBackground().ignoresSafeArea())
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-        }
     }
 }
 
