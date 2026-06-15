@@ -53,6 +53,7 @@
 		719857F147DA67B6A60C241E /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB43BE48C96E6C99DFDCD8E /* ScreenshotTests.swift */; };
 		7A88F4EE1EBCCC45B00CC691 /* MachineDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780117DEF662A76F53D13E95 /* MachineDefinition.swift */; };
 		82126F3EDC52DCBF39637A05 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AD43DD460EEBD4AB4C355A /* PersistenceController.swift */; };
+		8223A963205FF2258A58964E /* ScanTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DABB871F45846E1B00437C9 /* ScanTabView.swift */; };
 		86AA9262DACA00CFE6376FB0 /* GymTwinWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB73740D6F93E7A77119C9C8 /* GymTwinWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8B5BB42E3AE3CC32E763F33F /* MachineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB98CCA001DE8AE5EBC3C90 /* MachineDetailView.swift */; };
 		8CD9B245143A93B297F1671A /* WatchMachineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1960781B981D1236EC4244A9 /* WatchMachineView.swift */; };
@@ -191,6 +192,7 @@
 		75E0D95995AB719F8E2B8BEA /* PremiumCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumCards.swift; sourceTree = "<group>"; };
 		7698C4C0B7281FFA2719F2B2 /* NFCService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCService.swift; sourceTree = "<group>"; };
 		780117DEF662A76F53D13E95 /* MachineDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachineDefinition.swift; sourceTree = "<group>"; };
+		7DABB871F45846E1B00437C9 /* ScanTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTabView.swift; sourceTree = "<group>"; };
 		8013728F984F9DF598CDA995 /* WorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewModel.swift; sourceTree = "<group>"; };
 		82BF84F8AA8346A6B41F986A /* GymTwinTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = GymTwinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		860331DE350DD663AC9DD7AC /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 			isa = PBXGroup;
 			children = (
 				3045F4166FF5D49288A2CABA /* ScanFlowView.swift */,
+				7DABB871F45846E1B00437C9 /* ScanTabView.swift */,
 			);
 			path = Scan;
 			sourceTree = "<group>";
@@ -866,6 +869,7 @@
 				3895B6C2FB801F89E91767A7 /* RootView.swift in Sources */,
 				D79AC81C1DC9B45DCE1BCCA7 /* SampleData.swift in Sources */,
 				B281ACD5518A716C6F19F2AC /* ScanFlowView.swift in Sources */,
+				8223A963205FF2258A58964E /* ScanTabView.swift in Sources */,
 				43E72288DE1B1007D8714A37 /* SettingsView.swift in Sources */,
 				0205948553E982AA02BBB64B /* SettingsViewModel.swift in Sources */,
 				0EE846F7F618F4959309EF5E /* StorageService.swift in Sources */,
