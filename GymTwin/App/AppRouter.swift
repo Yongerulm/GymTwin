@@ -1,12 +1,14 @@
 import SwiftUI
 
-/// Top-level tabs of the iOS app. Four tabs, training-first IA:
-/// Today (home), Gym (digital twin), Progress (analytics), Settings.
+/// Top-level tabs of the iOS app. Five tabs, training-first IA:
+/// Dashboard (home), Workouts (training hub), Scan (fast start),
+/// Analytics (progress), Profile (settings).
 enum AppTab: Hashable {
-    case today
-    case gym
-    case progress
-    case settings
+    case dashboard
+    case workouts
+    case scan
+    case analytics
+    case profile
 }
 
 /// Lightweight cross-feature navigation state. Features remain decoupled —
@@ -18,7 +20,7 @@ enum AppTab: Hashable {
 @MainActor
 @Observable
 final class AppRouter {
-    var selectedTab: AppTab = .today
+    var selectedTab: AppTab = .dashboard
 
     /// Drives the full-screen workout flow. When `isWorkoutActive` is true the
     /// flow is presented; `workoutMachineID` optionally pre-seeds a machine.
@@ -36,6 +38,8 @@ final class AppRouter {
         workoutMachineID = nil
     }
 
-    func openGym() { selectedTab = .gym }
-    func openProgress() { selectedTab = .progress }
+    /// Jump to the Workouts hub (which hosts the gym digital twin).
+    func openGym() { selectedTab = .workouts }
+    /// Jump to the Analytics tab.
+    func openProgress() { selectedTab = .analytics }
 }

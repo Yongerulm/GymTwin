@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The app's root tab container. Four training-first tabs; the workout flow is
+/// The app's root tab container. Five training-first tabs; the workout flow is
 /// presented full-screen over the whole app so it stays focused while running.
 struct RootView: View {
     @Environment(\.modelContext) private var modelContext
@@ -10,20 +10,24 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $router.selectedTab) {
             TodayView()
-                .tabItem { Label("Today", systemImage: "bolt.heart.fill") }
-                .tag(AppTab.today)
+                .tabItem { Label("Dashboard", systemImage: "bolt.heart.fill") }
+                .tag(AppTab.dashboard)
 
-            GymView()
-                .tabItem { Label("Gym", systemImage: "dumbbell.fill") }
-                .tag(AppTab.gym)
+            WorkoutsHubView()
+                .tabItem { Label("Workouts", systemImage: "dumbbell.fill") }
+                .tag(AppTab.workouts)
+
+            ScanTabView()
+                .tabItem { Label("Scan", systemImage: "wave.3.right") }
+                .tag(AppTab.scan)
 
             ProgressDashboardView()
-                .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
-                .tag(AppTab.progress)
+                .tabItem { Label("Analytics", systemImage: "chart.line.uptrend.xyaxis") }
+                .tag(AppTab.analytics)
 
             SettingsView()
-                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
-                .tag(AppTab.settings)
+                .tabItem { Label("Profile", systemImage: "person.crop.circle.fill") }
+                .tag(AppTab.profile)
         }
         .tint(DS.Palette.accent)
         .preferredColorScheme(.dark)

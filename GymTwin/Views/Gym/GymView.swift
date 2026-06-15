@@ -9,7 +9,12 @@ struct GymView: View {
 
     // MARK: - Init
 
-    init() {}
+    /// When `embedded` is true the view renders without its own `NavigationStack`,
+    /// so it can be pushed onto a host stack (e.g. the Workouts hub). The default
+    /// keeps it self-contained for any standalone use.
+    init(embedded: Bool = false) { self.embedded = embedded }
+
+    private let embedded: Bool
 
     // MARK: - Environment
 
@@ -49,7 +54,15 @@ struct GymView: View {
     // MARK: - Body
 
     var body: some View {
-        NavigationStack {
+        if embedded {
+            gymContent
+        } else {
+            NavigationStack { gymContent }
+        }
+    }
+
+    @ViewBuilder
+    private var gymContent: some View {
             Group {
                 if displayedAreas.isEmpty && searchText.isEmpty {
                     emptyGymState
@@ -93,7 +106,6 @@ struct GymView: View {
                 machineModel.bind(modelContext)
             }
             .onChange(of: allMachines) { machineModel.refresh() }
-        }
     }
 
     // MARK: - Main scrollable content
