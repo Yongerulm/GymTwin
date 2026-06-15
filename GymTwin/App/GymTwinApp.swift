@@ -11,6 +11,8 @@ struct GymTwinApp: App {
         self.container = container
         // Seed sample data on first launch so the app is never empty.
         SampleData.seedIfNeeded(container.mainContext)
+        // Seed the bundled exercise library (1000+ movements) once.
+        ExerciseSeeder.seedIfNeeded(container.mainContext)
         _syncCoordinator = State(initialValue: SyncCoordinator(context: container.mainContext))
     }
 

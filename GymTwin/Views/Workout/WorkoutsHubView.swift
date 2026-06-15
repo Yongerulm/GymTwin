@@ -80,6 +80,17 @@ struct WorkoutsHubView: View {
                     subtitle: "Build and pick your routine"
                 )
             }
+
+            NavigationLink {
+                ExerciseLibraryView()
+            } label: {
+                hubRow(
+                    icon: "books.vertical.fill",
+                    tint: DS.Palette.rest,
+                    title: "Exercise Library",
+                    subtitle: "1000+ exercises to explore"
+                )
+            }
         }
     }
 
