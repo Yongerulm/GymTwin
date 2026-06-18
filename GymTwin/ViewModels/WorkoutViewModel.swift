@@ -72,6 +72,8 @@ final class WorkoutViewModel {
         isActive = true
         startDate = Date()
         startTimer()
+        WorkoutLiveActivityController.start(gymName: "FitPilot AI", startedAt: startDate)
+        WidgetSyncService.setWorkoutActive(true)
     }
 
     /// Persist the draft session as a `Workout`, save to HealthKit, then reset.
@@ -146,6 +148,24 @@ final class WorkoutViewModel {
         exercises = []
         elapsedSeconds = 0
         startDate = Date()
+        Task { await WorkoutLiveActivityController.end() }
+        WidgetSyncService.setWorkoutActive(false)
+    }
+
+    /// Push the current exercise + set count to the Live Activity (no-op when
+    /// no session/activity is running). Elapsed time is rendered live by the
+    /// widget from the start date, so only content changes need a push.
+    private func syncLiveActivity() {
+        guard isActive else { return }
+        let totalSets = exercises.reduce(0) { $0 + $1.sets.count }
+        let current = exercises.last?.machineName ?? "Warming up"
+        Task {
+            await WorkoutLiveActivityController.update(
+                currentExercise: current,
+                setsLogged: totalSets,
+                planProgress: nil
+            )
+        }
     }
 
     // MARK: - Exercise management
@@ -154,6 +174,7 @@ final class WorkoutViewModel {
         // Prevent duplicate machines in a single session.
         guard !exercises.contains(where: { $0.machineID == machine.id }) else { return }
         exercises.append(DraftExercise(machineID: machine.id, machineName: machine.name))
+        syncLiveActivity()
     }
 
     /// Add a machine by UUID, fetching it from the persistent store.
@@ -165,6 +186,7 @@ final class WorkoutViewModel {
         )
         guard let machine = try? context.fetch(descriptor).first else { return }
         exercises.append(DraftExercise(machineID: machine.id, machineName: machine.name))
+        syncLiveActivity()
     }
 
     func removeExercise(at offsets: IndexSet) {
@@ -182,6 +204,7 @@ final class WorkoutViewModel {
         guard index < exercises.count else { return }
         let set = DraftSet(weight: weight, reps: reps, type: type)
         exercises[index].sets.append(set)
+        syncLiveActivity()
     }
 
     /// Duplicate the last logged set of the exercise at `index` (same weight +
@@ -191,6 +214,7 @@ final class WorkoutViewModel {
         guard index < exercises.count, let last = exercises[index].sets.last else { return nil }
         let copy = DraftSet(weight: last.weight, reps: last.reps, type: last.type)
         exercises[index].sets.append(copy)
+        syncLiveActivity()
         return copy
     }
 
@@ -204,6 +228,7 @@ final class WorkoutViewModel {
     func removeSet(id: UUID, fromExerciseAt index: Int) {
         guard index < exercises.count else { return }
         exercises[index].sets.removeAll { $0.id == id }
+        syncLiveActivity()
     }
 
     // MARK: - Last-session passthrough

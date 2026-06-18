@@ -44,6 +44,22 @@ targets:
     dependencies:
       - target: GymTwinWatch
         embed: true
+      - target: GymTwinWidgets
+        embed: true
+
+  GymTwinWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: GymTwinShared/Shared/DesignTokens.swift
+      - path: GymTwinShared/Persistence/AppGroup.swift
+      - path: GymTwinShared/Widget
+      - path: GymTwinWidgets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.markusvaitl.gymtwin.widgets
+        INFOPLIST_FILE: GymTwinWidgets/Info.plist
+        CODE_SIGN_ENTITLEMENTS: GymTwinWidgets/GymTwinWidgets.entitlements
 
   GymTwinWatch:
     type: application

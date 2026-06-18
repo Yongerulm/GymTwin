@@ -121,6 +121,20 @@ final class ProgressViewModel {
             sleepHours: sleepHours,
             workoutsLast7Days: statistics.workoutsThisWeek
         )
+        WidgetSyncService.update(
+            statistics: statistics,
+            readiness: readiness,
+            readinessTitle: readinessBand.title,
+            topReadyMuscle: topReadyMuscleName
+        )
+    }
+
+    /// The most-recovered muscle group ready to train, for the widget's
+    /// one-glance suggestion. Prefers a fully-rested group, else the highest %.
+    private var topReadyMuscleName: String? {
+        let ready = muscleRecovery.filter { $0.band == .ready || $0.band == .fresh }
+        return (ready.max { $0.recoveryPercent < $1.recoveryPercent }
+            ?? muscleRecovery.max { $0.recoveryPercent < $1.recoveryPercent })?.displayName
     }
 
     // MARK: - Weekly volume (last 8 ISO weeks, oldest first)

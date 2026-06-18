@@ -4,6 +4,7 @@ import SwiftUI
 /// presented full-screen over the whole app so it stays focused while running.
 struct RootView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @State private var router = AppRouter()
     @State private var gymSelection = GymSelection()
 
@@ -37,6 +38,17 @@ struct RootView: View {
             WorkoutFlowView(initialMachineID: router.workoutMachineID)
                 .environment(router)
                 .environment(gymSelection)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Honour a "Start Workout" App Intent (Siri / widget) on activation.
+            if phase == .active, WidgetIntentBridge.consumeStartWorkout() {
+                router.startWorkout()
+            }
+        }
+        .task {
+            if WidgetIntentBridge.consumeStartWorkout() {
+                router.startWorkout()
+            }
         }
     }
 }

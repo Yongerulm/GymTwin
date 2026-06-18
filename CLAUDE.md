@@ -14,6 +14,7 @@ Reference gym in the seed data: **Shanghai Racket Club (SRC)**.
 
 - **Swift 6** (strict concurrency), **SwiftUI**, **SwiftData**, **Observation** (`@Observable`)
 - **HealthKit**, **WatchConnectivity**, **CoreNFC**, **VisionKit/AVFoundation** (QR)
+- **WidgetKit** (home/lock-screen widgets), **App Intents** (Siri "Start Workout"), **ActivityKit** (in-workout Live Activity)
 - **MVVM** architecture, offline-first
 - Project generated with **XcodeGen** from `project.yml`
 - Optional, abstracted seams: **OpenSearch** equipment repository, Apple Foundation Models / cloud LLM
@@ -66,6 +67,13 @@ GymTwin/              iOS app
   ViewModels/         Today, Gym, Machine, Workout, Progress, Settings, Plan, Admin, Recognition
   Views/              Today, Gym, Machines, Workout, Progress, History, Settings, Plan, Profile, Admin, Components
   Resources/          machines.json (9 SRC machines), Assets.xcassets (AppIcon, area-*, micon-* icons)
+  App/                + StartWorkoutIntent + GymTwinShortcuts (App Intents / Siri)
+  Services/           + WidgetSyncService (writes WidgetSnapshot, reloads timelines),
+                        WorkoutLiveActivityController (start/update/end the Live Activity)
+GymTwinShared/Widget/ WidgetSnapshot + WidgetSnapshotStore + WidgetIntentBridge (App Group hand-off),
+                      WorkoutActivityAttributes (ActivityKit)
+GymTwinWidgets/       iOS widget extension: ReadinessWidget (small/medium + lock-screen
+                      accessories) + WorkoutLiveActivityWidget (Dynamic Island + lock screen)
 GymTwinWatch/         watchOS app (standalone training, Digital Crown, HKWorkoutSession)
 GymTwinTests/         XCTest (73 tests): models, WorkoutService, DTOs, sample data, AI coach, recognition, repository, muscle recovery
 GymTwinUITests/       Screenshot UI test (navigates main screens, attaches screenshots)
