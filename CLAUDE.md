@@ -57,7 +57,8 @@ GymTwin/              iOS app
   Services/
     WorkoutService    PRs / stats / streak / history (derived, not duplicated)
     HealthKitService  auth, workout write, body metrics + steps/sleep/VO2Max
-    RecoveryService   deterministic recovery score
+    RecoveryService   deterministic recovery score + HRV-led daily readiness
+    MuscleRecoveryService  per-muscle-group recovery % (volume-scaled window since last session)
     AI/               AIWorkoutCoach protocol, DeterministicWorkoutCoach (rules), CoachService (history bridge)
     Recognition/      MachineRecognitionService (code parser), NFCService, QRScannerView
     Repository/       MachineRepository protocol, LocalMachineRepository (bundled machines.json),
@@ -66,7 +67,7 @@ GymTwin/              iOS app
   Views/              Today, Gym, Machines, Workout, Progress, History, Settings, Plan, Profile, Admin, Components
   Resources/          machines.json (9 SRC machines), Assets.xcassets (AppIcon, area-*, micon-* icons)
 GymTwinWatch/         watchOS app (standalone training, Digital Crown, HKWorkoutSession)
-GymTwinTests/         XCTest (60 tests): models, WorkoutService, DTOs, sample data, AI coach, recognition, repository
+GymTwinTests/         XCTest (73 tests): models, WorkoutService, DTOs, sample data, AI coach, recognition, repository, muscle recovery
 GymTwinUITests/       Screenshot UI test (navigates main screens, attaches screenshots)
 branding/             Icon/art generation sources (gen.py uses Gemini; .gemini_key is gitignored)
 ```

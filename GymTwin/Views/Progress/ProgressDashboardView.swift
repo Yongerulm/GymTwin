@@ -34,6 +34,9 @@ struct ProgressDashboardView: View {
                 topMetricsSection
                 readinessSection
                 recoverySection
+                if !model.muscleRecovery.isEmpty {
+                    muscleRecoverySection
+                }
                 healthSection
                 weeklyVolumeSection
                 if !model.muscleBalance.isEmpty {
@@ -179,6 +182,74 @@ struct ProgressDashboardView: View {
             )
             .accessibilityLabel("Recovery score: \(model.recoveryScore) out of 100")
         }
+    }
+
+    // MARK: - Muscle recovery (per-group)
+
+    private var muscleRecoverySection: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            PremiumSectionHeader("Muscle Recovery", subtitle: "Per group, since last session")
+            SurfaceCard {
+                VStack(spacing: DS.Spacing.md) {
+                    ForEach(model.muscleRecovery) { status in
+                        muscleRecoveryRow(status)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func muscleRecoveryRow(_ status: MuscleRecoveryStatus) -> some View {
+        let tint = DS.Muscle.color(for: status.muscle)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: DS.Spacing.sm) {
+                Image(systemName: DS.Muscle.symbol(for: status.muscle))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 22)
+                Text(status.displayName)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text(recoveryBandLabel(status.band))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(tint)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(tint.opacity(0.15), in: Capsule())
+                Text("\(status.recoveryPercent)%")
+                    .font(.subheadline.weight(.bold).monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .frame(width: 44, alignment: .trailing)
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.white.opacity(0.08))
+                    Capsule().fill(tint)
+                        .frame(width: geo.size.width * CGFloat(status.recoveryPercent) / 100)
+                }
+            }
+            .frame(height: 7)
+
+            Text(recoverySubtitle(status))
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(status.displayName) recovery \(status.recoveryPercent) percent, \(recoveryBandLabel(status.band))")
+    }
+
+    private func recoveryBandLabel(_ band: MuscleRecoveryBand) -> String {
+        band.label
+    }
+
+    private func recoverySubtitle(_ status: MuscleRecoveryStatus) -> String {
+        guard let hours = status.hoursSinceTrained else { return "Not trained recently — fresh" }
+        if hours < 1 { return "Trained just now" }
+        if hours < 24 { return "Trained \(Int(hours.rounded()))h ago" }
+        let days = Int((hours / 24).rounded())
+        return "Trained \(days)d ago"
     }
 
     // MARK: - Health highlights

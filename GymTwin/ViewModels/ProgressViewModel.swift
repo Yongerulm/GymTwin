@@ -21,6 +21,9 @@ final class ProgressViewModel {
     /// Volume grouped by muscle area, sorted descending, for balance bars.
     private(set) var muscleBalance: [(area: String, volume: Double)] = []
 
+    /// Per-muscle-group recovery (0–100 %), one entry per tracked group.
+    private(set) var muscleRecovery: [MuscleRecoveryStatus] = []
+
     /// Recent workouts for the history list, newest first.
     private(set) var recentWorkouts: [Workout] = []
 
@@ -74,6 +77,7 @@ final class ProgressViewModel {
         weeklyVolume = buildWeeklyVolume(from: workouts)
         personalRecords = buildPersonalRecords(service: service)
         muscleBalance = buildMuscleBalance(from: workouts, context: context)
+        muscleRecovery = buildMuscleRecovery(from: workouts, context: context)
         updateRecoveryScore()
     }
 
@@ -184,6 +188,37 @@ final class ProgressViewModel {
         return volumeByArea
             .map { (area: $0.key, volume: $0.value) }
             .sorted { $0.volume > $1.volume }
+    }
+
+    // MARK: - Muscle recovery (per-group recovery % from last session)
+
+    private func buildMuscleRecovery(from workouts: [Workout], context: ModelContext) -> [MuscleRecoveryStatus] {
+        // machineID -> canonical muscle key, via the machine's area or category.
+        let machines = (try? context.fetch(FetchDescriptor<Machine>())) ?? []
+        var muscleByMachineID: [UUID: String] = [:]
+        for machine in machines {
+            let source = machine.area?.name ?? machine.category
+            if let muscle = MuscleRecoveryService.canonicalMuscle(from: source) {
+                muscleByMachineID[machine.id] = muscle
+            }
+        }
+
+        // One event per (workout, muscle), volume summed across that muscle's
+        // exercises in the session. The service keeps only the latest per muscle.
+        var events: [MuscleTrainingEvent] = []
+        for workout in workouts {
+            var volumeByMuscle: [String: Double] = [:]
+            for exercise in workout.exercises {
+                guard let muscle = muscleByMachineID[exercise.machineID] else { continue }
+                let volume = exercise.sets.reduce(0.0) { $0 + ($1.weight * Double($1.repetitions)) }
+                volumeByMuscle[muscle, default: 0] += volume
+            }
+            for (muscle, volume) in volumeByMuscle {
+                events.append(MuscleTrainingEvent(muscle: muscle, date: workout.date, volume: volume))
+            }
+        }
+
+        return MuscleRecoveryService.statuses(events: events, now: Date())
     }
 }
 
