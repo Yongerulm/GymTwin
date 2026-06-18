@@ -29,7 +29,7 @@ struct WorkoutFlowView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if model.exercises.isEmpty {
+                if model.exercises.isEmpty && activePlan == nil {
                     emptyPrompt
                 } else {
                     sessionContent
@@ -161,6 +161,10 @@ struct WorkoutFlowView: View {
     private var sessionContent: some View {
         ScrollView {
             VStack(spacing: DS.Spacing.lg) {
+                // Guided plan banner — current exercise/set/target + Complete Set.
+                if let plan = activePlan {
+                    guidedBanner(plan)
+                }
                 // Exercise cards
                 ForEach(Array(model.exercises.enumerated()), id: \.element.id) { index, exercise in
                     ExerciseSessionCard(
@@ -468,6 +472,94 @@ struct WorkoutFlowView: View {
         if let byID = plan.target(forMachineID: machine.id) { return byID }
         if let code = machine.machineCode { return plan.target(forCode: code) }
         return nil
+    }
+
+    // MARK: - Guided workout mode
+
+    /// The user's currently active training plan, if one is selected.
+    private var activePlan: WorkoutPlan? {
+        guard !activePlanID.isEmpty else { return nil }
+        return plans.first { $0.id.uuidString == activePlanID }
+    }
+
+    /// Completed set count for a planned machine in the live session.
+    private func completedSets(forMachineID id: UUID) -> Int {
+        model.exercises.first(where: { $0.machineID == id })?.sets.count ?? 0
+    }
+
+    /// The next planned step to perform, or nil when the plan is complete.
+    private func guidedStep(_ plan: WorkoutPlan) -> (exercise: PlanExercise, index: Int, setNumber: Int)? {
+        let sorted = plan.sortedExercises
+        for (i, pe) in sorted.enumerated() where completedSets(forMachineID: pe.machineID) < pe.targetSets {
+            return (pe, i, completedSets(forMachineID: pe.machineID) + 1)
+        }
+        return nil
+    }
+
+    /// Log a planned set at its target and start the rest timer.
+    private func completeGuidedSet(_ target: PlanExercise) {
+        if !model.isActive { model.start() }
+        if !model.exercises.contains(where: { $0.machineID == target.machineID }) {
+            model.addExerciseByID(target.machineID)
+        }
+        guard let idx = model.exercises.firstIndex(where: { $0.machineID == target.machineID }) else { return }
+        model.addSet(weight: target.targetWeight, reps: target.targetReps, type: .working, toExerciseAt: idx)
+        showingRestTimer = true
+    }
+
+    @ViewBuilder
+    private func guidedBanner(_ plan: WorkoutPlan) -> some View {
+        SurfaceCard {
+            if let step = guidedStep(plan) {
+                VStack(alignment: .leading, spacing: DS.Spacing.md) {
+                    HStack {
+                        Text(plan.name)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(DS.Palette.accent)
+                            .textCase(.uppercase)
+                            .tracking(0.6)
+                        Spacer()
+                        Text("Exercise \(step.index + 1)/\(plan.sortedExercises.count)")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Text(step.exercise.machineName).font(.title2.weight(.bold))
+                    HStack(spacing: DS.Spacing.xl) {
+                        guidedStat("Set", "\(step.setNumber)/\(step.exercise.targetSets)")
+                        guidedStat("Target", "\(step.exercise.targetReps) reps")
+                        guidedStat("Weight", "\(weightText(step.exercise.targetWeight)) kg")
+                    }
+                    Button {
+                        completeGuidedSet(step.exercise)
+                    } label: {
+                        Label("Complete Set", systemImage: "checkmark.circle.fill")
+                    }
+                    .buttonStyle(GradientButtonStyle())
+                }
+            } else {
+                VStack(spacing: DS.Spacing.sm) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .font(.system(size: 40))
+                        .foregroundStyle(DS.Palette.success)
+                    Text("Plan complete — great work!")
+                        .font(.headline.weight(.bold))
+                    Text("Finish your workout, or add extra sets below.")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private func guidedStat(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value).font(.headline.weight(.bold)).monospacedDigit().contentTransition(.numericText())
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+    }
+
+    private func weightText(_ w: Double) -> String {
+        w == w.rounded() ? String(Int(w)) : String(format: "%.1f", w)
     }
 
     /// Files a freshly created machine under the active gym, in an area that
