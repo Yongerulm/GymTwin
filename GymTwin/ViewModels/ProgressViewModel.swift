@@ -53,16 +53,39 @@ final class ProgressViewModel {
     /// Banded readiness, for the dashboard recommendation line.
     var readinessBand: ReadinessBand { ReadinessBand.from(readiness) }
 
+    /// Natural-language coaching line for the dashboard (on-device LLM when
+    /// available, deterministic template otherwise).
+    private(set) var coachInsight: String = ""
+
     // MARK: - Internal
 
     private var context: ModelContext?
+    private let narrator: CoachNarrator = CoachNarratorProvider.make()
 
     // MARK: - Bind
 
     func bind(_ context: ModelContext) {
         self.context = context
         refresh()
-        Task { await refreshHealth() }
+        Task {
+            await refreshHealth()
+            await refreshCoachInsight()
+        }
+    }
+
+    // MARK: - Coach insight (async — text coaching)
+
+    func refreshCoachInsight() async {
+        let context = CoachingContext(
+            readiness: readiness,
+            readinessTitle: readinessBand.title,
+            workoutsThisWeek: statistics.workoutsThisWeek,
+            weeklyGoal: 5,
+            streakDays: statistics.currentStreakDays,
+            topReadyMuscle: topReadyMuscleName,
+            goal: .muscleGain
+        )
+        coachInsight = await narrator.dailyInsight(context)
     }
 
     // MARK: - Refresh (sync — workout data)

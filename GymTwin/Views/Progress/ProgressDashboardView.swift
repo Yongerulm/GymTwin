@@ -33,6 +33,9 @@ struct ProgressDashboardView: View {
             LazyVStack(spacing: DS.Spacing.xl) {
                 topMetricsSection
                 readinessSection
+                if !model.coachInsight.isEmpty {
+                    coachSection
+                }
                 recoverySection
                 if !model.muscleRecovery.isEmpty {
                     muscleRecoverySection
@@ -166,6 +169,28 @@ struct ProgressDashboardView: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(value).font(.subheadline.weight(.bold)).monospacedDigit()
             Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - AI coach insight
+
+    private var coachSection: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            PremiumSectionHeader("AI Coach", subtitle: "On-device guidance")
+            SurfaceCard {
+                HStack(alignment: .top, spacing: DS.Spacing.md) {
+                    Image(systemName: "sparkles")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(DS.Palette.accentGradient)
+                    Text(model.coachInsight)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("AI coach: \(model.coachInsight)")
         }
     }
 
