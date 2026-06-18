@@ -27,15 +27,29 @@ final class AppRouter {
     var isWorkoutActive = false
     var workoutMachineID: UUID?
 
-    /// Start a workout from anywhere, optionally pre-selecting a machine.
+    /// When true the flow skips the program picker and starts in free /
+    /// scan-first mode (used by the dedicated Scan tab).
+    var workoutScanMode = false
+
+    /// Start a workout from anywhere. With no machine it opens the program
+    /// picker first; pre-selecting a machine skips straight into the session.
     func startWorkout(machineID: UUID? = nil) {
         workoutMachineID = machineID
+        workoutScanMode = false
+        isWorkoutActive = true
+    }
+
+    /// Start a scan-first session (free training, no program picker).
+    func startScan() {
+        workoutMachineID = nil
+        workoutScanMode = true
         isWorkoutActive = true
     }
 
     func endWorkout() {
         isWorkoutActive = false
         workoutMachineID = nil
+        workoutScanMode = false
     }
 
     /// Jump to the Workouts hub (which hosts the gym digital twin).

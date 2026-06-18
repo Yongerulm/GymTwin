@@ -217,7 +217,7 @@
 		1F154E7DC4B5A0217DAA1E09 /* GymBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymBackground.swift; sourceTree = "<group>"; };
 		22ACC5B15992547FF8880D49 /* SampleDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataTests.swift; sourceTree = "<group>"; };
 		2344A69A32325F5849914270 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		23F716753280D1A6E54214CB /* GymTwin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GymTwin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		23F716753280D1A6E54214CB /* GymTwin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GymTwin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		251F23229591020A7428EA8A /* ExerciseCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCatalog.swift; sourceTree = "<group>"; };
 		279C19CB61CA2C80F6240238 /* WatchWorkoutSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchWorkoutSession.swift; sourceTree = "<group>"; };
 		2C00EB0CC1CB963FAEEC1C3E /* OpenSearchMachineRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSearchMachineRepository.swift; sourceTree = "<group>"; };
@@ -874,7 +874,6 @@
 						TestTargetID = C6726322E7593F979BFED491;
 					};
 					C6726322E7593F979BFED491 = {
-						DevelopmentTeam = R68833AU53;
 						ProvisioningStyle = Automatic;
 					};
 					FF37C53F4509A3CADAB0972D = {
@@ -1212,6 +1211,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GymTwin/GymTwin.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = R68833AU53;
 				INFOPLIST_FILE = GymTwin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1230,6 +1230,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GymTwin/GymTwin.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = R68833AU53;
 				INFOPLIST_FILE = GymTwin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

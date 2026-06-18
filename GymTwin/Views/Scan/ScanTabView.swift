@@ -27,7 +27,7 @@ struct ScanTabView: View {
                 .padding(.horizontal, DS.Spacing.xl)
 
                 Button {
-                    router.startWorkout()
+                    router.startScan()
                 } label: {
                     Label("Start & Scan", systemImage: "wave.3.right")
                 }

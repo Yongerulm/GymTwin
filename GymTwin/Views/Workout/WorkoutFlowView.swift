@@ -5,6 +5,8 @@ import SwiftData
 /// Owns its own `NavigationStack` and `WorkoutViewModel`.
 struct WorkoutFlowView: View {
     let initialMachineID: UUID?
+    /// Scan-first entry (Scan tab): skip the program picker, train freely.
+    var scanMode: Bool = false
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
@@ -22,9 +24,15 @@ struct WorkoutFlowView: View {
     @State private var setEntryTarget: SetEntryTarget?
 
     /// Hands-free mode: keep the NFC reader armed so walking up to a machine
-    /// and tapping the phone loads it — no button press per machine.
-    @State private var continuousScan = true
+    /// and tapping the phone loads it. Off by default — scanning is always
+    /// user-initiated, so the NFC sheet never opens unprompted on launch.
+    @State private var continuousScan = false
     @State private var scanTask: Task<Void, Never>?
+
+    /// Gates the session behind an explicit program choice. Until the user
+    /// picks a plan (or free training), the program picker is shown instead of
+    /// the session — so "Start Workout" never auto-loads a stale active plan.
+    @State private var programChosen = false
 
     /// Transient "machine detected" banner shown on a successful scan, paired
     /// with a success haptic — the near-invisible NFC feedback.
@@ -34,26 +42,37 @@ struct WorkoutFlowView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if model.exercises.isEmpty && activePlan == nil {
+                if !programChosen {
+                    programSelection
+                } else if model.exercises.isEmpty && activePlan == nil {
                     emptyPrompt
                 } else {
                     sessionContent
                 }
             }
-            .navigationTitle(timerString)
+            .navigationTitle(programChosen ? timerString : "Start Workout")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarItems }
             .background(GymBackground().ignoresSafeArea())
-            .safeAreaInset(edge: .bottom) { bottomBar }
+            .safeAreaInset(edge: .bottom) {
+                if programChosen { bottomBar }
+            }
             .overlay(alignment: .top) { detectionBanner }
         }
         .task {
             model.bind(modelContext)
-            if !model.isActive { model.start() }
             if let id = initialMachineID {
+                // Started from a specific machine — skip the picker.
+                if !model.isActive { model.start() }
                 model.addExerciseByID(id)
+                programChosen = true
+            } else if scanMode {
+                // Scan tab — free training, no plan, no auto-scan sheet.
+                activePlanID = ""
+                if !model.isActive { model.start() }
+                programChosen = true
             }
-            armContinuousScan()
+            // Otherwise wait for the user to choose a program (no scanning).
         }
         .onChange(of: setEntryTarget?.id) { _, newValue in
             // When the set-entry sheet closes, re-arm scanning for the next machine.
@@ -121,6 +140,113 @@ struct WorkoutFlowView: View {
         } message: {
             Text("Your session will be saved and synced to Health.")
         }
+    }
+
+    // MARK: - Program selection (first step of Start Workout)
+
+    private var sortedPlans: [WorkoutPlan] {
+        plans.sorted { $0.sortIndex < $1.sortIndex }
+    }
+
+    private var programSelection: some View {
+        ScrollView {
+            VStack(spacing: DS.Spacing.lg) {
+                VStack(spacing: DS.Spacing.xs) {
+                    Text("Choose your program")
+                        .font(.title2.weight(.bold))
+                        .multilineTextAlignment(.center)
+                    Text("Follow a saved plan, or train freely and scan machines as you go.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.top, DS.Spacing.lg)
+                .padding(.horizontal, DS.Spacing.lg)
+
+                // Free training — no plan.
+                programCard(
+                    title: "Free Training",
+                    subtitle: "No plan — scan or add machines as you go",
+                    systemImage: "bolt.fill",
+                    tint: DS.Palette.accent
+                ) { chooseFreeTraining() }
+
+                // Saved plans.
+                ForEach(sortedPlans) { plan in
+                    programCard(
+                        title: plan.name,
+                        subtitle: planSubtitle(plan),
+                        systemImage: "list.bullet.rectangle.portrait.fill",
+                        tint: DS.Palette.accentSecondary
+                    ) { chooseProgram(plan) }
+                }
+
+                if sortedPlans.isEmpty {
+                    Text("Build training plans in the Workouts tab to follow them here.")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, DS.Spacing.xl)
+                        .padding(.top, DS.Spacing.sm)
+                }
+            }
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.bottom, DS.Spacing.xxl)
+        }
+    }
+
+    private func planSubtitle(_ plan: WorkoutPlan) -> String {
+        let count = plan.exercises.count
+        let sets = plan.exercises.reduce(0) { $0 + $1.targetSets }
+        return "\(count) exercise\(count == 1 ? "" : "s") · \(sets) sets"
+    }
+
+    private func programCard(
+        title: String,
+        subtitle: String,
+        systemImage: String,
+        tint: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            SurfaceCard {
+                HStack(spacing: DS.Spacing.md) {
+                    Image(systemName: systemImage)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(tint)
+                        .frame(width: 46, height: 46)
+                        .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(title).font(.headline.weight(.bold))
+                        Text(subtitle).font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: DS.Spacing.sm)
+                    Image(systemName: "chevron.right")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title). \(subtitle)")
+    }
+
+    /// Free training: clear any active plan, start an empty session.
+    private func chooseFreeTraining() {
+        activePlanID = ""
+        if !model.isActive { model.start() }
+        withAnimation(DS.Motion.spring) { programChosen = true }
+    }
+
+    /// Load the chosen plan as the active program and pre-populate the session
+    /// with all its exercises, then enter the guided session.
+    private func chooseProgram(_ plan: WorkoutPlan) {
+        activePlanID = plan.id.uuidString
+        if !model.isActive { model.start() }
+        for planExercise in plan.sortedExercises {
+            model.addExerciseByID(planExercise.machineID)
+        }
+        withAnimation(DS.Motion.spring) { programChosen = true }
     }
 
     // MARK: - Empty prompt
@@ -337,23 +463,25 @@ struct WorkoutFlowView: View {
 
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            Label(timerString, systemImage: "timer")
-                .font(.subheadline.weight(.semibold).monospacedDigit())
-                .foregroundStyle(DS.Palette.accent)
-                .contentTransition(.numericText())
-                .animation(.default, value: model.elapsedSeconds)
-        }
-        ToolbarItem(placement: .navigationBarTrailing) {
-            if NFCService.isAvailable {
-                Button {
-                    continuousScan.toggle()
-                } label: {
-                    Image(systemName: continuousScan ? "wave.3.right.circle.fill" : "wave.3.right.circle")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(continuousScan ? DS.Palette.accent : .secondary)
+        if programChosen {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Label(timerString, systemImage: "timer")
+                    .font(.subheadline.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(DS.Palette.accent)
+                    .contentTransition(.numericText())
+                    .animation(.default, value: model.elapsedSeconds)
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if NFCService.isAvailable {
+                    Button {
+                        continuousScan.toggle()
+                    } label: {
+                        Image(systemName: continuousScan ? "wave.3.right.circle.fill" : "wave.3.right.circle")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(continuousScan ? DS.Palette.accent : .secondary)
+                    }
+                    .accessibilityLabel(continuousScan ? "Hands-free scanning on" : "Hands-free scanning off")
                 }
-                .accessibilityLabel(continuousScan ? "Hands-free scanning on" : "Hands-free scanning off")
             }
         }
         ToolbarItem(placement: .navigationBarTrailing) {

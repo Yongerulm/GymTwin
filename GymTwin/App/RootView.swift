@@ -35,7 +35,7 @@ struct RootView: View {
         .environment(router)
         .environment(gymSelection)
         .fullScreenCover(isPresented: $router.isWorkoutActive) {
-            WorkoutFlowView(initialMachineID: router.workoutMachineID)
+            WorkoutFlowView(initialMachineID: router.workoutMachineID, scanMode: router.workoutScanMode)
                 .environment(router)
                 .environment(gymSelection)
         }
