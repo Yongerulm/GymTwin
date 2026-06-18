@@ -26,6 +26,11 @@ struct WorkoutFlowView: View {
     @State private var continuousScan = true
     @State private var scanTask: Task<Void, Never>?
 
+    /// Transient "machine detected" banner shown on a successful scan, paired
+    /// with a success haptic — the near-invisible NFC feedback.
+    @State private var detectedMachineName: String?
+    @State private var detectBannerTask: Task<Void, Never>?
+
     var body: some View {
         NavigationStack {
             Group {
@@ -40,6 +45,7 @@ struct WorkoutFlowView: View {
             .toolbar { toolbarItems }
             .background(GymBackground().ignoresSafeArea())
             .safeAreaInset(edge: .bottom) { bottomBar }
+            .overlay(alignment: .top) { detectionBanner }
         }
         .task {
             model.bind(modelContext)
@@ -375,6 +381,58 @@ struct WorkoutFlowView: View {
         return String(format: "%02d:%02d", m, s)
     }
 
+    // MARK: - Detection banner (near-invisible NFC feedback)
+
+    @ViewBuilder
+    private var detectionBanner: some View {
+        if let name = detectedMachineName {
+            HStack(spacing: DS.Spacing.sm) {
+                Image(systemName: "wave.3.right.circle.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(DS.Palette.accent)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Machine detected")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                        .tracking(0.5)
+                    Text(name)
+                        .font(.subheadline.weight(.bold))
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.vertical, DS.Spacing.md)
+            .background(.regularMaterial, in: Capsule())
+            .overlay(Capsule().strokeBorder(DS.Palette.accent.opacity(0.35), lineWidth: 1))
+            .shadow(color: .black.opacity(0.25), radius: 12, y: 4)
+            .padding(.horizontal, DS.Spacing.lg)
+            .padding(.top, DS.Spacing.sm)
+            .transition(.move(edge: .top).combined(with: .opacity))
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Machine detected: \(name)")
+        }
+    }
+
+    /// Show the detection banner with a success haptic, then auto-hide it.
+    @MainActor
+    private func flashDetection(_ name: String) {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+        detectBannerTask?.cancel()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            detectedMachineName = name
+        }
+        detectBannerTask = Task {
+            try? await Task.sleep(for: .seconds(1.8))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.3)) {
+                detectedMachineName = nil
+            }
+        }
+    }
+
     // MARK: - Continuous (hands-free) scanning
 
     /// Arm the NFC reader so the next machine the user taps loads automatically.
@@ -425,6 +483,8 @@ struct WorkoutFlowView: View {
             try? modelContext.save()
             machine = new
         }
+
+        flashDetection(machine.name)
 
         model.addExercise(machine: machine)
         guard let index = model.exercises.firstIndex(where: { $0.machineID == machine.id }) else { return }
