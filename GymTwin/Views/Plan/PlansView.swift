@@ -61,15 +61,10 @@ struct PlansListView: View {
     private func planRow(_ plan: WorkoutPlan) -> some View {
         SurfaceCard {
             HStack(spacing: DS.Spacing.md) {
-                Button {
-                    activePlanID = isActive(plan) ? "" : plan.id.uuidString
-                } label: {
-                    Image(systemName: isActive(plan) ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundStyle(isActive(plan) ? DS.Palette.success : Color.secondary)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(isActive(plan) ? "Active plan" : "Set as active plan")
+                Image(systemName: "list.bullet.rectangle.portrait.fill")
+                    .font(.title3)
+                    .foregroundStyle(DS.Palette.accentSecondary)
+                    .frame(width: 28)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(plan.name).font(.headline.weight(.bold))
