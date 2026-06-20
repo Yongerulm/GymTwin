@@ -72,7 +72,6 @@
 		797FC559E0919C2D97C57BAD /* WorkoutActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653E850B0D24E954D64E4A0D /* WorkoutActivityAttributes.swift */; };
 		7A88F4EE1EBCCC45B00CC691 /* MachineDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 780117DEF662A76F53D13E95 /* MachineDefinition.swift */; };
 		82126F3EDC52DCBF39637A05 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AD43DD460EEBD4AB4C355A /* PersistenceController.swift */; };
-		8223A963205FF2258A58964E /* ScanTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DABB871F45846E1B00437C9 /* ScanTabView.swift */; };
 		86AA9262DACA00CFE6376FB0 /* GymTwinWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = EB73740D6F93E7A77119C9C8 /* GymTwinWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		87132BF19C36C8CC3B5DBDA1 /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D4CB001D48B87D48A8D29 /* ExerciseDetailView.swift */; };
 		8AD48581FF99C64E9C4B02FB /* WidgetSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE74C36EAE1CFBA37574621 /* WidgetSnapshot.swift */; };
@@ -98,6 +97,7 @@
 		A3947EE989A0DE5FC99C92FB /* WorkoutSetEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 401636DF9EDFE35655F24DF2 /* WorkoutSetEntryView.swift */; };
 		A89B0167B786BCBAD5C8DD8C /* MachineSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754E2B4CE919E8DD4EE943C5 /* MachineSetting.swift */; };
 		A8F4B51CA577862E72E75FBA /* WatchWorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED85C2BB95831EFD138767A /* WatchWorkoutIntents.swift */; };
+		AAD2E047A97A37AFA30F3E57 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C8A7D4CD7B5675B4F41673 /* OnboardingView.swift */; };
 		ABF3280FA5F91177B118B617 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F668FB2D0169E44A5ECA41E6 /* Assets.xcassets */; };
 		AD327654DEFB7C8D9634A2F3 /* UIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA719115FC7E20B3FC25592 /* UIComponents.swift */; };
 		ADAC33D56C691944D1147C74 /* WorkoutPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDB60E10B18BD727E22653D /* WorkoutPlan.swift */; };
@@ -264,7 +264,6 @@
 		7698C4C0B7281FFA2719F2B2 /* NFCService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCService.swift; sourceTree = "<group>"; };
 		77C62ABD563C6C06C1F44262 /* ExerciseLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibraryView.swift; sourceTree = "<group>"; };
 		780117DEF662A76F53D13E95 /* MachineDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachineDefinition.swift; sourceTree = "<group>"; };
-		7DABB871F45846E1B00437C9 /* ScanTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTabView.swift; sourceTree = "<group>"; };
 		7E46890885D467BE82B6B4F2 /* GymTwinWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GymTwinWidgets.entitlements; sourceTree = "<group>"; };
 		8013728F984F9DF598CDA995 /* WorkoutViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViewModel.swift; sourceTree = "<group>"; };
 		82BF84F8AA8346A6B41F986A /* GymTwinTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = GymTwinTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -277,6 +276,7 @@
 		8FDB60E10B18BD727E22653D /* WorkoutPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlan.swift; sourceTree = "<group>"; };
 		93E6D7405F6BF071FC576A95 /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		94EB78C106E235FC66B97011 /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
+		95C8A7D4CD7B5675B4F41673 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		99AE1D1C8C09B407F8E357C4 /* WorkoutLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveActivityController.swift; sourceTree = "<group>"; };
 		9B282E8C1FE7E4A0BDB11628 /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		9D67600880CCE9E738C19038 /* WorkoutServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutServiceTests.swift; sourceTree = "<group>"; };
@@ -500,6 +500,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		77A9DF142A7500B549435E9D /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				95C8A7D4CD7B5675B4F41673 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
 		792F009EB8B02B60465AB838 /* Machines */ = {
 			isa = PBXGroup;
 			children = (
@@ -518,6 +526,7 @@
 				EA760ADAD29C9A7CF8729C70 /* Gym */,
 				E64C500E738CA1AA0EFECBB1 /* History */,
 				792F009EB8B02B60465AB838 /* Machines */,
+				77A9DF142A7500B549435E9D /* Onboarding */,
 				5A60F36823C1FD61EBFD913E /* Plan */,
 				506B9F4FC9E2C39B38EF202F /* Profile */,
 				C06D6BFCED57BC737C255754 /* Progress */,
@@ -581,7 +590,6 @@
 			isa = PBXGroup;
 			children = (
 				3045F4166FF5D49288A2CABA /* ScanFlowView.swift */,
-				7DABB871F45846E1B00437C9 /* ScanTabView.swift */,
 			);
 			path = Scan;
 			sourceTree = "<group>";
@@ -1042,6 +1050,7 @@
 				F572D8CEABEC1A007E347788 /* MachineViewModel.swift in Sources */,
 				3BF0348427193881CF67200E /* MuscleRecoveryService.swift in Sources */,
 				F4C8CD79FAFB5B2B937410EF /* NFCService.swift in Sources */,
+				AAD2E047A97A37AFA30F3E57 /* OnboardingView.swift in Sources */,
 				AF02323B80C81BAE70062CE6 /* OpenSearchMachineRepository.swift in Sources */,
 				82126F3EDC52DCBF39637A05 /* PersistenceController.swift in Sources */,
 				64A5E34D6B2684B6BA373B4D /* PlanGeneratorView.swift in Sources */,
@@ -1056,7 +1065,6 @@
 				3895B6C2FB801F89E91767A7 /* RootView.swift in Sources */,
 				D79AC81C1DC9B45DCE1BCCA7 /* SampleData.swift in Sources */,
 				B281ACD5518A716C6F19F2AC /* ScanFlowView.swift in Sources */,
-				8223A963205FF2258A58964E /* ScanTabView.swift in Sources */,
 				29C30CA0213D31EEBDB17574 /* SessionSummaryView.swift in Sources */,
 				43E72288DE1B1007D8714A37 /* SettingsView.swift in Sources */,
 				0205948553E982AA02BBB64B /* SettingsViewModel.swift in Sources */,

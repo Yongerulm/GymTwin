@@ -7,6 +7,7 @@ struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var router = AppRouter()
     @State private var gymSelection = GymSelection()
+    @AppStorage("has.onboarded") private var hasOnboarded = false
 
     var body: some View {
         TabView(selection: $router.selectedTab) {
@@ -34,6 +35,9 @@ struct RootView: View {
             WorkoutFlowView(initialMachineID: router.workoutMachineID, scanMode: router.workoutScanMode)
                 .environment(router)
                 .environment(gymSelection)
+        }
+        .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { if $0 == false { hasOnboarded = true } })) {
+            OnboardingView { hasOnboarded = true }
         }
         .onChange(of: scenePhase) { _, phase in
             // Honour a "Start Workout" App Intent (Siri / widget) on activation.

@@ -372,6 +372,10 @@ struct WorkoutFlowView: View {
                         isActive: index == activeExerciseIndex,
                         lastSession: model.lastSession(forMachineID: exercise.machineID),
                         onCompleteSet: exercise.targetWeight != nil ? { completePlannedSet(at: index) } : nil,
+                        onLogSet: { weight, reps in
+                            model.addSet(weight: weight, reps: reps, type: .working, toExerciseAt: index)
+                            showingRestTimer = true
+                        },
                         onAddSet: {
                             let last = exercise.sets.last
                             setEntryTarget = SetEntryTarget(
@@ -901,10 +905,17 @@ private struct ExerciseSessionCard: View {
     let lastSession: WorkoutExercise?
     /// Logs a set at the predefined target (plan exercises only).
     var onCompleteSet: (() -> Void)? = nil
+    /// Logs a set inline (weight, reps) without opening the modal sheet.
+    var onLogSet: ((Double, Int) -> Void)? = nil
     let onAddSet: () -> Void
     let onRepeatSet: () -> Void
     let onRemoveSet: (UUID) -> Void
     let onRemoveExercise: () -> Void
+
+    // Inline quick-add editor state.
+    @State private var showInline = false
+    @State private var inlineWeight: Double = 0
+    @State private var inlineReps: Int = 0
 
     private func fmtWeight(_ w: Double) -> String {
         w == w.rounded() ? String(Int(w)) : String(format: "%.1f", w)
@@ -1021,37 +1032,48 @@ private struct ExerciseSessionCard: View {
                     }
                 }
 
-                // Add Set + Repeat last set
-                HStack(spacing: DS.Spacing.sm) {
-                    Button(action: onAddSet) {
-                        Label("Add Set", systemImage: "plus.circle.fill")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(DS.Palette.accent)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, DS.Spacing.sm)
-                    }
-                    .buttonStyle(.plain)
-                    .background(
-                        DS.Palette.accent.opacity(0.06),
-                        in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous)
-                    )
-                    .accessibilityLabel("Add a set to \(exercise.machineName)")
-
-                    // One-tap copy of the previous set (same weight + reps).
-                    if !exercise.sets.isEmpty {
-                        Button(action: onRepeatSet) {
-                            Label("Repeat", systemImage: "square.on.square")
+                // Inline quick-add editor, or Add Set / Repeat buttons.
+                if showInline, onLogSet != nil {
+                    inlineEditor
+                } else {
+                    HStack(spacing: DS.Spacing.sm) {
+                        Button {
+                            if onLogSet != nil {
+                                seedInline()
+                                withAnimation(DS.Motion.snappy) { showInline = true }
+                            } else {
+                                onAddSet()
+                            }
+                        } label: {
+                            Label("Add Set", systemImage: "plus.circle.fill")
                                 .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(DS.Palette.success)
+                                .foregroundStyle(DS.Palette.accent)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, DS.Spacing.sm)
                         }
                         .buttonStyle(.plain)
                         .background(
-                            DS.Palette.success.opacity(0.10),
+                            DS.Palette.accent.opacity(0.06),
                             in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous)
                         )
-                        .accessibilityLabel("Repeat last set on \(exercise.machineName)")
+                        .accessibilityLabel("Add a set to \(exercise.machineName)")
+
+                        // One-tap copy of the previous set (same weight + reps).
+                        if !exercise.sets.isEmpty {
+                            Button(action: onRepeatSet) {
+                                Label("Repeat", systemImage: "square.on.square")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(DS.Palette.success)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, DS.Spacing.sm)
+                            }
+                            .buttonStyle(.plain)
+                            .background(
+                                DS.Palette.success.opacity(0.10),
+                                in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous)
+                            )
+                            .accessibilityLabel("Repeat last set on \(exercise.machineName)")
+                        }
                     }
                 }
             }
@@ -1061,6 +1083,84 @@ private struct ExerciseSessionCard: View {
                 .strokeBorder(DS.Palette.accent.opacity(isActive ? 0.55 : 0), lineWidth: 1.5)
         )
         .shadow(color: DS.Palette.accent.opacity(isActive ? 0.18 : 0), radius: 12, x: 0, y: 5)
+    }
+
+    // MARK: - Inline quick-add editor
+
+    private var inlineEditor: some View {
+        VStack(spacing: DS.Spacing.sm) {
+            HStack(spacing: DS.Spacing.md) {
+                inlineStepper(label: "kg", value: fmtWeight(inlineWeight),
+                              dec: { inlineWeight = max(0, inlineWeight - 2.5) },
+                              inc: { inlineWeight += 2.5 })
+                inlineStepper(label: "reps", value: "\(inlineReps)",
+                              dec: { inlineReps = max(1, inlineReps - 1) },
+                              inc: { inlineReps += 1 })
+            }
+            HStack(spacing: DS.Spacing.sm) {
+                Button {
+                    onLogSet?(inlineWeight, inlineReps)
+                    withAnimation(DS.Motion.snappy) { showInline = false }
+                } label: {
+                    Label("Log", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DS.Spacing.sm)
+                }
+                .buttonStyle(GradientButtonStyle())
+                .accessibilityLabel("Log \(fmtWeight(inlineWeight)) kg for \(inlineReps) reps")
+
+                Button { onAddSet(); showInline = false } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 44, height: 40)
+                        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Advanced set options")
+
+                Button { withAnimation(DS.Motion.snappy) { showInline = false } } label: {
+                    Image(systemName: "xmark")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(width: 44, height: 40)
+                        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Cancel")
+            }
+        }
+    }
+
+    private func inlineStepper(label: String, value: String, dec: @escaping () -> Void, inc: @escaping () -> Void) -> some View {
+        HStack(spacing: DS.Spacing.sm) {
+            inlineStepButton("minus", dec)
+            VStack(spacing: 0) {
+                Text(value).font(.headline.weight(.bold)).monospacedDigit().minimumScaleFactor(0.7).lineLimit(1)
+                Text(label).font(.caption2).foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            inlineStepButton("plus", inc)
+        }
+        .padding(.vertical, 4)
+        .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+    }
+
+    private func inlineStepButton(_ icon: String, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.body.weight(.bold))
+                .foregroundStyle(DS.Palette.accent)
+                .frame(width: 40, height: 40)
+                .background(DS.Palette.accent.opacity(0.12), in: Circle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func seedInline() {
+        inlineWeight = exercise.sets.last?.weight ?? exercise.targetWeight ?? lastSession?.sortedSets.first?.weight ?? 20
+        inlineReps = exercise.sets.last?.reps ?? exercise.targetReps ?? lastSession?.sortedSets.first?.repetitions ?? 10
     }
 
     private func formatSet(weight: Double, reps: Int) -> String {
