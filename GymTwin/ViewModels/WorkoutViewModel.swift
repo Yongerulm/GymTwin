@@ -26,11 +26,38 @@ struct DraftExercise: Identifiable {
     let machineName: String
     var sets: [DraftSet]
 
-    init(id: UUID = UUID(), machineID: UUID, machineName: String, sets: [DraftSet] = []) {
+    /// Plan linkage (nil for free training). Set when the exercise comes from a
+    /// selected plan so the card can show its predefined target and allow
+    /// duplicate machines (e.g. two Chest Press entries at different weights).
+    var planExerciseID: UUID?
+    var targetSets: Int?
+    var targetReps: Int?
+    var targetWeight: Double?
+
+    init(
+        id: UUID = UUID(),
+        machineID: UUID,
+        machineName: String,
+        sets: [DraftSet] = [],
+        planExerciseID: UUID? = nil,
+        targetSets: Int? = nil,
+        targetReps: Int? = nil,
+        targetWeight: Double? = nil
+    ) {
         self.id = id
         self.machineID = machineID
         self.machineName = machineName
         self.sets = sets
+        self.planExerciseID = planExerciseID
+        self.targetSets = targetSets
+        self.targetReps = targetReps
+        self.targetWeight = targetWeight
+    }
+
+    /// Whether all the plan's target sets have been logged for this exercise.
+    var isPlanComplete: Bool {
+        guard let targetSets else { return false }
+        return sets.count >= targetSets
     }
 }
 
@@ -186,6 +213,28 @@ final class WorkoutViewModel {
         )
         guard let machine = try? context.fetch(descriptor).first else { return }
         exercises.append(DraftExercise(machineID: machine.id, machineName: machine.name))
+        syncLiveActivity()
+    }
+
+    /// Append a planned exercise from a selected plan. Always appends (so the
+    /// same machine can appear more than once with different targets) and
+    /// carries the predefined sets/reps/weight for the card to display.
+    func addPlannedExercise(
+        machineID: UUID,
+        machineName: String,
+        planExerciseID: UUID,
+        targetSets: Int,
+        targetReps: Int,
+        targetWeight: Double
+    ) {
+        exercises.append(DraftExercise(
+            machineID: machineID,
+            machineName: machineName,
+            planExerciseID: planExerciseID,
+            targetSets: targetSets,
+            targetReps: targetReps,
+            targetWeight: targetWeight
+        ))
         syncLiveActivity()
     }
 

@@ -245,8 +245,17 @@ struct WorkoutFlowView: View {
     private func chooseProgram(_ plan: WorkoutPlan) {
         activePlanID = plan.id.uuidString
         if !model.isActive { model.start() }
-        for planExercise in plan.sortedExercises {
-            model.addExerciseByID(planExercise.machineID)
+        // Load every planned exercise (including duplicate machines) with its
+        // predefined target, so the whole program is laid out to work through.
+        for pe in plan.sortedExercises {
+            model.addPlannedExercise(
+                machineID: pe.machineID,
+                machineName: pe.machineName,
+                planExerciseID: pe.id,
+                targetSets: pe.targetSets,
+                targetReps: pe.targetReps,
+                targetWeight: pe.targetWeight
+            )
         }
         withAnimation(DS.Motion.spring) { programChosen = true }
     }
@@ -295,24 +304,26 @@ struct WorkoutFlowView: View {
     private var sessionContent: some View {
         ScrollView {
             VStack(spacing: DS.Spacing.lg) {
-                // Guided plan banner — current exercise/set/target + Complete Set.
+                // Slim plan progress header (no duplicated banner card).
                 if let plan = activePlan {
-                    guidedBanner(plan)
+                    planProgressHeader(plan)
                 }
-                // Exercise cards (skip the one mirrored in the guided banner)
+                // One card per exercise — each shows its predefined target and a
+                // Complete Set button so the program is worked through top-down.
                 ForEach(Array(model.exercises.enumerated()), id: \.element.id) { index, exercise in
-                    if exercise.machineID != currentGuidedMachineID {
                     ExerciseSessionCard(
                         exercise: exercise,
                         exerciseIndex: index,
+                        isActive: index == activeExerciseIndex,
                         lastSession: model.lastSession(forMachineID: exercise.machineID),
+                        onCompleteSet: exercise.targetWeight != nil ? { completePlannedSet(at: index) } : nil,
                         onAddSet: {
                             let last = exercise.sets.last
                             setEntryTarget = SetEntryTarget(
                                 exerciseIndex: index,
                                 exerciseName: exercise.machineName,
-                                lastWeight: last?.weight ?? 20,
-                                lastReps: last?.reps ?? 10,
+                                lastWeight: last?.weight ?? exercise.targetWeight ?? 20,
+                                lastReps: last?.reps ?? exercise.targetReps ?? 10,
                                 machineID: exercise.machineID
                             )
                         },
@@ -330,7 +341,6 @@ struct WorkoutFlowView: View {
                             model.removeExercise(id: exercise.id)
                         }
                     )
-                    }
                 }
 
                 // Add machine dashed button
@@ -343,6 +353,43 @@ struct WorkoutFlowView: View {
             .padding(.top, DS.Spacing.md)
             .padding(.bottom, 120)
         }
+    }
+
+    // MARK: - Plan progress + complete planned set
+
+    /// Index of the current exercise to train: the first one whose predefined
+    /// target sets aren't met yet (plan exercises only).
+    private var activeExerciseIndex: Int? {
+        model.exercises.firstIndex { $0.targetSets != nil && !$0.isPlanComplete }
+    }
+
+    /// Slim header showing the plan name and how many exercises are done.
+    private func planProgressHeader(_ plan: WorkoutPlan) -> some View {
+        let total = model.exercises.count
+        let done = model.exercises.filter(\.isPlanComplete).count
+        return HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(plan.name.uppercased())
+                    .font(.system(size: 9, weight: .semibold)).tracking(1)
+                    .foregroundStyle(DS.Palette.accent)
+                Text("Work through your program")
+                    .font(.subheadline.weight(.bold))
+            }
+            Spacer()
+            Text("\(done)/\(total)")
+                .font(.headline.weight(.bold).monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Log a set at the exercise's predefined target and start the rest timer.
+    private func completePlannedSet(at index: Int) {
+        guard model.exercises.indices.contains(index),
+              let weight = model.exercises[index].targetWeight,
+              let reps = model.exercises[index].targetReps else { return }
+        model.addSet(weight: weight, reps: reps, type: .working, toExerciseAt: index)
+        showingRestTimer = true
     }
 
     // MARK: - Add machine button
@@ -794,11 +841,26 @@ private struct SetEntryTarget: Identifiable {
 private struct ExerciseSessionCard: View {
     let exercise: DraftExercise
     let exerciseIndex: Int
+    /// Highlighted as the current exercise to work on (first not yet complete).
+    var isActive: Bool = false
     let lastSession: WorkoutExercise?
+    /// Logs a set at the predefined target (plan exercises only).
+    var onCompleteSet: (() -> Void)? = nil
     let onAddSet: () -> Void
     let onRepeatSet: () -> Void
     let onRemoveSet: (UUID) -> Void
     let onRemoveExercise: () -> Void
+
+    private func fmtWeight(_ w: Double) -> String {
+        w == w.rounded() ? String(Int(w)) : String(format: "%.1f", w)
+    }
+
+    private func targetStat(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(value).font(.system(size: 17, weight: .heavy)).monospacedDigit()
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+        }
+    }
 
     /// Suggested next set: last weight + last reps from this session,
     /// falling back to the previous session's top set.
@@ -820,13 +882,22 @@ private struct ExerciseSessionCard: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(exercise.machineName)
                             .font(.headline.weight(.bold))
-                        if !exercise.sets.isEmpty {
+                        if let tSets = exercise.targetSets {
+                            Text("\(exercise.sets.count)/\(tSets) sets")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(exercise.isPlanComplete ? DS.Palette.success : .secondary)
+                        } else if !exercise.sets.isEmpty {
                             Text("\(exercise.sets.count) set\(exercise.sets.count == 1 ? "" : "s")")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
                     Spacer()
+                    if exercise.isPlanComplete {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(DS.Palette.success)
+                    }
                     Button(role: .destructive, action: onRemoveExercise) {
                         Image(systemName: "trash")
                             .font(.caption.weight(.semibold))
@@ -834,6 +905,22 @@ private struct ExerciseSessionCard: View {
                             .frame(width: 36, height: 36)
                     }
                     .accessibilityLabel("Remove \(exercise.machineName) from session")
+                }
+
+                // Predefined plan target + one-tap Complete Set.
+                if let tReps = exercise.targetReps, let tWeight = exercise.targetWeight, let tSets = exercise.targetSets {
+                    HStack(spacing: DS.Spacing.xl) {
+                        targetStat("Set", "\(min(exercise.sets.count + (exercise.isPlanComplete ? 0 : 1), tSets))/\(tSets)")
+                        targetStat("Target", "\(tReps) reps")
+                        targetStat("Weight", "\(fmtWeight(tWeight)) kg")
+                    }
+                    if let onCompleteSet, !exercise.isPlanComplete {
+                        Button(action: onCompleteSet) {
+                            Label("Complete Set", systemImage: "checkmark.circle.fill")
+                        }
+                        .buttonStyle(GradientButtonStyle())
+                        .accessibilityLabel("Complete a set on \(exercise.machineName) at target")
+                    }
                 }
 
                 // Suggested next set chip (compact inline)
@@ -914,6 +1001,11 @@ private struct ExerciseSessionCard: View {
                 }
             }
         }
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
+                .strokeBorder(DS.Palette.accent.opacity(isActive ? 0.55 : 0), lineWidth: 1.5)
+        )
+        .shadow(color: DS.Palette.accent.opacity(isActive ? 0.18 : 0), radius: 12, x: 0, y: 5)
     }
 
     private func formatSet(weight: Double, reps: Int) -> String {
