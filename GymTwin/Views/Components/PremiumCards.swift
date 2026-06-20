@@ -47,66 +47,78 @@ struct HeroWorkoutCard: View {
     let subtitle: String
     let dateText: String
     let lastSummary: String?
+    /// Current training streak, shown as a flame pill when > 0.
+    var streakDays: Int? = nil
     let startAction: () -> Void
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            // Radial halo depth layer
+        ZStack {
+            // Ember gradient base
             RoundedRectangle(cornerRadius: DS.Radius.xl, style: .continuous)
-                .fill(DS.Palette.heroHalo)
+                .fill(LinearGradient(
+                    colors: [Color(hex: "#FF7A40"), Color(hex: "#E84A00"), Color(hex: "#B82800")],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                ))
 
-            // Main card surface
+            // Top white highlight (covers upper portion)
             RoundedRectangle(cornerRadius: DS.Radius.xl, style: .continuous)
-                .fill(DS.Palette.surface)
+                .fill(LinearGradient(colors: [.white.opacity(0.14), .clear], startPoint: .top, endPoint: .center))
 
-            // Hairline stroke
-            RoundedRectangle(cornerRadius: DS.Radius.xl, style: .continuous)
-                .strokeBorder(.white.opacity(0.07), lineWidth: 1)
+            // Bottom-right radial glow
+            RadialGradient(colors: [.white.opacity(0.10), .clear], center: .bottomTrailing, startRadius: 0, endRadius: 240)
+                .clipShape(RoundedRectangle(cornerRadius: DS.Radius.xl, style: .continuous))
 
-            VStack(alignment: .leading, spacing: DS.Spacing.xl) {
-                // Header row
+            VStack(alignment: .leading, spacing: 0) {
+                // Top: date caps + headline, streak pill on the right
                 HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+                    VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                        Text(dateText.uppercased())
+                            .font(.system(size: 9, weight: .medium)).tracking(1.3)
+                            .foregroundStyle(.white.opacity(0.7))
                         Text(title)
-                            .font(.title.weight(.bold))
-                        Text(subtitle)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 28, weight: .heavy)).tracking(-0.6)
+                            .foregroundStyle(.white)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Spacer()
-                    Text(dateText)
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, DS.Spacing.md)
-                        .padding(.vertical, DS.Spacing.xs)
-                        .background(.white.opacity(0.06), in: Capsule())
+                    Spacer(minLength: DS.Spacing.sm)
+                    if let streakDays, streakDays > 0 {
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill").font(.system(size: 11, weight: .bold))
+                            Text("\(streakDays) day\(streakDays == 1 ? "" : "s")").font(.system(size: 11, weight: .bold))
+                        }
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10).padding(.vertical, 6)
+                        .background(.white.opacity(0.22), in: Capsule())
+                    }
                 }
 
-                // Optional last-session summary chip
-                if let lastSummary {
-                    HStack(spacing: DS.Spacing.xs) {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(.caption)
-                            .foregroundStyle(DS.Palette.accent)
-                        Text(lastSummary)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, DS.Spacing.md)
-                    .padding(.vertical, DS.Spacing.sm)
-                    .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
-                }
+                Spacer(minLength: DS.Spacing.lg)
 
-                // Start button
-                Button(action: startAction) {
-                    Label("Start Workout", systemImage: "play.fill")
+                // Bottom: dim stats + white START button
+                HStack(alignment: .bottom) {
+                    Text(lastSummary ?? subtitle)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.78))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: DS.Spacing.md)
+                    Button(action: startAction) {
+                        HStack(spacing: 6) {
+                            Text("START").font(.system(size: 13, weight: .heavy))
+                            Image(systemName: "chevron.right").font(.system(size: 11, weight: .heavy))
+                        }
+                        .foregroundStyle(Color(hex: "#C83400"))
+                        .padding(.horizontal, 20).padding(.vertical, 10)
+                        .background(.white.opacity(0.95), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 4)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Start workout")
                 }
-                .buttonStyle(GradientButtonStyle())
-                .accessibilityLabel("Start workout")
             }
-            .padding(DS.Spacing.xl)
+            .padding(18)
         }
-        .shadow(color: .black.opacity(0.22), radius: 24, x: 0, y: 12)
+        .frame(minHeight: 172)
+        .shadow(color: DS.Palette.accent.opacity(0.28), radius: 22, x: 0, y: 12)
         .accessibilityElement(children: .contain)
     }
 }

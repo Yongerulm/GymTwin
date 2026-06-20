@@ -51,6 +51,7 @@ struct TodayView: View {
             subtitle: heroSubtitle,
             dateText: model.dateText,
             lastSummary: model.lastSummary.map { "Last time: \($0)" },
+            streakDays: model.statistics.currentStreakDays,
             startAction: { router.startWorkout() }
         )
     }
@@ -82,10 +83,10 @@ struct TodayView: View {
         } label: {
             HStack(spacing: DS.Spacing.md) {
                 Image(systemName: "qrcode.viewfinder")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(DS.Palette.accentGradient)
-                    .frame(width: 48, height: 48)
-                    .background(DS.Palette.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous))
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(Color(hex: "#1A0700"))
+                    .frame(width: 40, height: 40)
+                    .background(DS.Palette.accent, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Scan Machine")
@@ -290,42 +291,32 @@ private struct RecentMachineChip: View {
     let ref: MachineRef
     let action: () -> Void
 
-    private var muscleColor: Color { DS.Muscle.color(for: ref.name) }
     private var muscleSymbol: String { DS.Muscle.symbol(for: ref.name) }
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: DS.Spacing.xs) {
+            // Ember: solid area-gradient chip with a white stroke icon + label.
+            VStack(spacing: DS.Spacing.sm) {
                 Image(systemName: muscleSymbol)
-                    .font(.title3)
-                    .foregroundStyle(muscleColor)
-                    .frame(width: 48, height: 48)
-                    .background(
-                        muscleColor.opacity(0.14),
-                        in: RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                    )
-
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(.white)
                 Text(ref.name)
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(.white)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-
-                Text(ref.lastTrained, style: .relative)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
             }
-            .frame(width: 90)
-            .padding(.vertical, DS.Spacing.md)
-            .padding(.horizontal, DS.Spacing.sm)
+            .frame(width: 76, height: 84)
+            .padding(.horizontal, 6)
             .background(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                    .fill(DS.Palette.surface)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(DS.Muscle.gradient(for: ref.name))
+                    .overlay(
+                        LinearGradient(colors: [.white.opacity(0.14), .clear], startPoint: .top, endPoint: .center)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    )
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                    .strokeBorder(.white.opacity(0.06), lineWidth: 1)
-            )
-            .shadow(color: .black.opacity(0.12), radius: 10, x: 0, y: 5)
+            .shadow(color: DS.Muscle.glow(for: ref.name).opacity(0.32), radius: 8, x: 0, y: 5)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Train \(ref.name), last trained \(ref.lastTrained.formatted(date: .abbreviated, time: .omitted))")

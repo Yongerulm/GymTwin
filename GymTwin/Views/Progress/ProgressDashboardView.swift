@@ -113,19 +113,29 @@ struct ProgressDashboardView: View {
             SurfaceCard {
                 VStack(alignment: .leading, spacing: DS.Spacing.md) {
                     HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.sm) {
+                        // Big readiness score with a warm radial glow behind it.
                         Text("\(model.readiness)")
-                            .font(.system(size: 44, weight: .bold, design: .rounded))
+                            .font(.system(size: 52, weight: .heavy, design: .rounded))
                             .monospacedDigit()
                             .contentTransition(.numericText())
                             .foregroundStyle(readinessColor)
-                        Text("/ 100").font(.headline).foregroundStyle(.secondary)
+                            .background(
+                                RadialGradient(
+                                    colors: [readinessColor.opacity(0.45), .clear],
+                                    center: .center, startRadius: 0, endRadius: 60
+                                )
+                                .blur(radius: 4)
+                            )
+                        Text("/ 100").font(.headline).foregroundStyle(DS.Palette.textTertiary)
                         Spacer()
                         Text(model.readinessBand.title)
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(readinessColor)
+                            .font(.system(size: 11, weight: .heavy))
+                            .textCase(.uppercase)
+                            .foregroundStyle(.white)
                             .padding(.horizontal, DS.Spacing.md)
                             .padding(.vertical, 6)
-                            .background(readinessColor.opacity(0.16), in: Capsule())
+                            .background(DS.Palette.accentGradient, in: Capsule())
+                            .shadow(color: DS.Palette.accent.opacity(0.35), radius: 6, y: 2)
                     }
 
                     GeometryReader { geo in
