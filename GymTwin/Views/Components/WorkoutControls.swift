@@ -107,18 +107,27 @@ private struct StepButton: View {
 /// Self-contained rest timer: countdown ring, mm:ss display, play/pause,
 /// reset, and +15 s. Manages its own @State timer via a 1-second Task loop.
 struct RestTimerView: View {
-    var durationSeconds: Int = 90
+    /// Configured rest length (persisted by the parent). Adjustable while idle
+    /// to set the preferred default; flexible down to 15 s.
+    @Binding var durationSeconds: Int
     var onFinished: (() -> Void)?
+    /// Called when the user skips the rest to jump straight to the next set.
+    var onSkip: (() -> Void)?
 
     @State private var remaining: Int
     @State private var isRunning: Bool = false
     @State private var timerTask: Task<Void, Never>?
     @State private var didFinish: Bool = false
 
-    init(durationSeconds: Int = 90, onFinished: (() -> Void)? = nil) {
-        self.durationSeconds = durationSeconds
+    private static let minDuration = 15
+    private static let maxDuration = 600
+    private static let maxRemaining = 900
+
+    init(durationSeconds: Binding<Int>, onFinished: (() -> Void)? = nil, onSkip: (() -> Void)? = nil) {
+        _durationSeconds = durationSeconds
         self.onFinished = onFinished
-        _remaining = State(initialValue: durationSeconds)
+        self.onSkip = onSkip
+        _remaining = State(initialValue: durationSeconds.wrappedValue)
     }
 
     private var progress: Double {
@@ -169,23 +178,14 @@ struct RestTimerView: View {
             }
             .frame(width: 140, height: 140)
 
-            // Controls row
+            // Main controls: −15 s · play/pause · +15 s
             HStack(spacing: DS.Spacing.xl) {
-                // Reset
-                TimerControlButton(systemImage: "arrow.counterclockwise", label: "Reset") {
-                    stopTimer()
-                    remaining = durationSeconds
-                    didFinish = false
-                }
+                // −15 s (trims the current rest, or lowers the default when idle)
+                TimerControlButton(systemImage: "minus", label: "−15 s") { adjust(-15) }
 
                 // Play / Pause
                 Button {
-                    if isRunning {
-                        stopTimer()
-                    } else {
-                        if remaining == 0 { remaining = durationSeconds; didFinish = false }
-                        startTimer()
-                    }
+                    togglePlay()
                 } label: {
                     Image(systemName: isRunning ? "pause.fill" : "play.fill")
                         .font(.title2.weight(.semibold))
@@ -200,10 +200,39 @@ struct RestTimerView: View {
                 .animation(DS.Motion.snappy, value: isRunning)
 
                 // +15 s
-                TimerControlButton(systemImage: "plus", label: "+15 s") {
-                    remaining = min(remaining + 15, 599)
-                    if remaining > 0 && !isRunning { startTimer() }
+                TimerControlButton(systemImage: "plus", label: "+15 s") { adjust(15) }
+            }
+
+            // Secondary row: reset · skip
+            HStack(spacing: DS.Spacing.md) {
+                Button {
+                    stopTimer()
+                    remaining = durationSeconds
+                    didFinish = false
+                } label: {
+                    Label("Reset", systemImage: "arrow.counterclockwise")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DS.Spacing.sm)
+                        .background(.white.opacity(0.06), in: Capsule())
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Reset rest timer")
+
+                Button {
+                    stopTimer()
+                    onSkip?()
+                } label: {
+                    Label("Skip Rest", systemImage: "forward.fill")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, DS.Spacing.sm)
+                        .background(DS.Palette.rest, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Skip rest and continue to the next set")
             }
         }
         .padding(DS.Spacing.xl)
@@ -219,6 +248,33 @@ struct RestTimerView: View {
         .sensoryFeedback(.success, trigger: didFinish)
         .onDisappear { stopTimer() }
         .accessibilityElement(children: .contain)
+    }
+
+    private func togglePlay() {
+        if isRunning {
+            stopTimer()
+        } else {
+            if remaining == 0 { remaining = durationSeconds; didFinish = false }
+            startTimer()
+        }
+    }
+
+    /// While running: extend/trim the current rest by `delta` seconds.
+    /// While idle: change the configured (persisted) rest length, flexible
+    /// down to 15 s, and reset the countdown to it.
+    private func adjust(_ delta: Int) {
+        if isRunning {
+            remaining = max(0, min(remaining + delta, Self.maxRemaining))
+            if remaining == 0 {
+                stopTimer()
+                didFinish = true
+                onFinished?()
+            }
+        } else {
+            durationSeconds = max(Self.minDuration, min(durationSeconds + delta, Self.maxDuration))
+            remaining = durationSeconds
+            didFinish = false
+        }
     }
 
     private func startTimer() {
@@ -302,9 +358,12 @@ private struct TimerControlButton: View {
 }
 
 #Preview("RestTimerView") {
-    RestTimerView(durationSeconds: 90) {
-        print("Rest finished")
+    struct Demo: View {
+        @State private var duration = 90
+        var body: some View {
+            RestTimerView(durationSeconds: $duration, onFinished: {}, onSkip: {})
+                .padding()
+        }
     }
-    .padding()
-    .preferredColorScheme(.dark)
+    return Demo().preferredColorScheme(.dark)
 }

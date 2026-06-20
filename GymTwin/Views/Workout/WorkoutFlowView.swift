@@ -14,6 +14,8 @@ struct WorkoutFlowView: View {
     @Query private var gyms: [Gym]
     @Query private var plans: [WorkoutPlan]
     @AppStorage("active.plan.id") private var activePlanID: String = ""
+    /// User's preferred rest length in seconds (flexible, persisted).
+    @AppStorage("rest.duration.seconds") private var restDuration: Int = 90
 
     @State private var model = WorkoutViewModel()
     @State private var showingMachinePicker = false
@@ -297,8 +299,9 @@ struct WorkoutFlowView: View {
                 if let plan = activePlan {
                     guidedBanner(plan)
                 }
-                // Exercise cards
+                // Exercise cards (skip the one mirrored in the guided banner)
                 ForEach(Array(model.exercises.enumerated()), id: \.element.id) { index, exercise in
+                    if exercise.machineID != currentGuidedMachineID {
                     ExerciseSessionCard(
                         exercise: exercise,
                         exerciseIndex: index,
@@ -327,6 +330,7 @@ struct WorkoutFlowView: View {
                             model.removeExercise(id: exercise.id)
                         }
                     )
+                    }
                 }
 
                 // Add machine dashed button
@@ -402,8 +406,11 @@ struct WorkoutFlowView: View {
                 .frame(width: 36, height: 4)
                 .padding(.top, DS.Spacing.md)
 
-            RestTimerView(durationSeconds: 90) {
+            RestTimerView(durationSeconds: $restDuration) {
                 // Auto-dismiss after rest finishes
+                showingRestTimer = false
+            } onSkip: {
+                // Skip → jump straight to the next set.
                 showingRestTimer = false
             }
             .padding(.horizontal, DS.Spacing.lg)
@@ -668,6 +675,13 @@ struct WorkoutFlowView: View {
     private var activePlan: WorkoutPlan? {
         guard !activePlanID.isEmpty else { return nil }
         return plans.first { $0.id.uuidString == activePlanID }
+    }
+
+    /// Machine id of the exercise currently shown in the guided banner — its
+    /// own card is hidden so the same exercise never appears twice.
+    private var currentGuidedMachineID: UUID? {
+        guard let plan = activePlan else { return nil }
+        return guidedStep(plan)?.exercise.machineID
     }
 
     /// Completed set count for a planned machine in the live session.

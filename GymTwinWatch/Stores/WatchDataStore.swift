@@ -1,4 +1,5 @@
 import Foundation
+import WatchKit
 
 /// Central in-memory + persisted store for the watch app.
 ///
@@ -9,6 +10,10 @@ import Foundation
 @Observable
 @MainActor
 final class WatchDataStore {
+
+    /// Shared instance so App Intents bound to the Apple Watch Action Button
+    /// can drive the same live workout the UI shows.
+    @MainActor static let shared = WatchDataStore()
 
     // MARK: - Catalog
 
@@ -22,6 +27,22 @@ final class WatchDataStore {
     private(set) var workoutStartDate: Date?
     /// Elapsed seconds since the workout started (driven by a 1 s Task loop).
     private(set) var elapsedSeconds: Int = 0
+
+    /// Index of the exercise the user is currently logging — the Action Button
+    /// logs the next set against this one.
+    var currentExerciseIndex: Int = 0
+
+    // MARK: - Rest timer (shared with the Action Button)
+
+    /// Preferred rest length in seconds (flexible, persisted, min 15 s).
+    var restGoalSeconds: Int {
+        get { max(15, defaults.object(forKey: restGoalKey) as? Int ?? 90) }
+        set { defaults.set(max(15, min(newValue, 600)), forKey: restGoalKey) }
+    }
+    private(set) var isResting = false
+    private(set) var restRemaining = 0
+    private var restTask: Task<Void, Never>?
+    private let restGoalKey = "gymtwin.rest.goal"
 
     // MARK: - HealthKit session
 
@@ -132,9 +153,55 @@ final class WatchDataStore {
         resetWorkout()
     }
 
+    // MARK: - Action Button + rest
+
+    /// One-press flow for the Apple Watch Ultra Action Button: log the next set
+    /// against the current exercise (mirroring the last set's weight/reps), give
+    /// a success haptic, and start the rest countdown. Falls back to sensible
+    /// defaults when no previous set exists.
+    func logNextSet() {
+        guard isWorkoutActive, exercises.indices.contains(currentExerciseIndex) else { return }
+        let last = exercises[currentExerciseIndex].sets.last
+        addSet(
+            weight: last?.weight ?? 20,
+            reps: last?.repetitions ?? 10,
+            toExerciseAt: currentExerciseIndex
+        )
+        WKInterfaceDevice.current().play(.success)
+        startRest()
+    }
+
+    /// Start (or restart) the rest countdown from the preferred goal.
+    func startRest(seconds: Int? = nil) {
+        let goal = seconds ?? restGoalSeconds
+        restTask?.cancel()
+        restRemaining = max(0, goal)
+        isResting = true
+        restTask = Task { [weak self] in
+            while let self, self.isResting, self.restRemaining > 0 {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled else { return }
+                self.restRemaining -= 1
+            }
+            if let self, self.restRemaining <= 0 {
+                self.isResting = false
+                WKInterfaceDevice.current().play(.stop)
+            }
+        }
+    }
+
+    /// Skip the current rest and jump straight to the next set.
+    func skipRest() {
+        restTask?.cancel()
+        restTask = nil
+        isResting = false
+        restRemaining = 0
+    }
+
     // MARK: - Private helpers
 
     private func resetWorkout() {
+        skipRest()
         isWorkoutActive = false
         exercises = []
         workoutStartDate = nil

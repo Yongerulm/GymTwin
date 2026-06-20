@@ -77,6 +77,10 @@ GymTwinShared/Widget/ WidgetSnapshot + WidgetSnapshotStore + WidgetIntentBridge 
 GymTwinWidgets/       iOS widget extension: ReadinessWidget (small/medium + lock-screen
                       accessories) + WorkoutLiveActivityWidget (Dynamic Island + lock screen)
 GymTwinWatch/         watchOS app (standalone training, Digital Crown, HKWorkoutSession)
+  Intents/            LogNextSetIntent + SkipRestIntent + GymTwinWatchShortcuts — bind
+                      "Log Next Set" to the Apple Watch Ultra Action Button (Settings →
+                      Action Button → Shortcut). Drives WatchDataStore.shared (logs the
+                      next set on the current exercise + starts the shared rest countdown).
 GymTwinTests/         XCTest (79 tests): models, WorkoutService, DTOs, sample data, AI coach, recognition, repository, muscle recovery
 GymTwinUITests/       Screenshot UI test (navigates main screens, attaches screenshots)
 branding/             Icon/art generation sources (gen.py uses Gemini; .gemini_key is gitignored)

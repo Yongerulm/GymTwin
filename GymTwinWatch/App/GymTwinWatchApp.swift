@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct GymTwinWatchApp: App {
-    @State private var store = WatchDataStore()
+    @State private var store = WatchDataStore.shared
 
     var body: some Scene {
         WindowGroup {

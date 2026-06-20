@@ -96,6 +96,7 @@
 		A04239B73FC837ACF7FF2308 /* MachineRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C12F13D8FA1C7F472AE2C2 /* MachineRecognitionService.swift */; };
 		A3947EE989A0DE5FC99C92FB /* WorkoutSetEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 401636DF9EDFE35655F24DF2 /* WorkoutSetEntryView.swift */; };
 		A89B0167B786BCBAD5C8DD8C /* MachineSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 754E2B4CE919E8DD4EE943C5 /* MachineSetting.swift */; };
+		A8F4B51CA577862E72E75FBA /* WatchWorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED85C2BB95831EFD138767A /* WatchWorkoutIntents.swift */; };
 		ABF3280FA5F91177B118B617 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F668FB2D0169E44A5ECA41E6 /* Assets.xcassets */; };
 		AD327654DEFB7C8D9634A2F3 /* UIComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA719115FC7E20B3FC25592 /* UIComponents.swift */; };
 		ADAC33D56C691944D1147C74 /* WorkoutPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDB60E10B18BD727E22653D /* WorkoutPlan.swift */; };
@@ -217,7 +218,7 @@
 		1F154E7DC4B5A0217DAA1E09 /* GymBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymBackground.swift; sourceTree = "<group>"; };
 		22ACC5B15992547FF8880D49 /* SampleDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataTests.swift; sourceTree = "<group>"; };
 		2344A69A32325F5849914270 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		23F716753280D1A6E54214CB /* GymTwin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GymTwin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		23F716753280D1A6E54214CB /* GymTwin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = GymTwin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		251F23229591020A7428EA8A /* ExerciseCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCatalog.swift; sourceTree = "<group>"; };
 		279C19CB61CA2C80F6240238 /* WatchWorkoutSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchWorkoutSession.swift; sourceTree = "<group>"; };
 		2C00EB0CC1CB963FAEEC1C3E /* OpenSearchMachineRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSearchMachineRepository.swift; sourceTree = "<group>"; };
@@ -236,6 +237,7 @@
 		47B04C3EBED56AC3CB065E58 /* MachineArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MachineArt.swift; sourceTree = "<group>"; };
 		4C2FF3203ED2FFFA683B6C5C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4C6495BDF9877F15F7D27E0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4ED85C2BB95831EFD138767A /* WatchWorkoutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchWorkoutIntents.swift; sourceTree = "<group>"; };
 		50CD4BD7EA0A23300390B367 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		5181065F36E7213EB0105438 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		544D0DCAEFE51D69073943C0 /* MuscleRecoveryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleRecoveryServiceTests.swift; sourceTree = "<group>"; };
@@ -320,6 +322,7 @@
 				036FA5B1FDED246119218EB8 /* GymTwinWatch.entitlements */,
 				DAE621F677E979A724BC443C /* Info.plist */,
 				64052CE43E8D6263E890099C /* App */,
+				A664C62D7353530775CC9111 /* Intents */,
 				DFB8E9EEC74C1C39F46978B9 /* Services */,
 				E64211595AD9651E300042BE /* Stores */,
 				C46A2DC8C2B5C340FB0EE5B5 /* Views */,
@@ -584,6 +587,14 @@
 			isa = PBXGroup;
 			children = (
 				5E9BBA095DDB5A3FB69780C3 /* StartWorkoutIntent.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		A664C62D7353530775CC9111 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				4ED85C2BB95831EFD138767A /* WatchWorkoutIntents.swift */,
 			);
 			path = Intents;
 			sourceTree = "<group>";
@@ -874,6 +885,7 @@
 						TestTargetID = C6726322E7593F979BFED491;
 					};
 					C6726322E7593F979BFED491 = {
+						DevelopmentTeam = R68833AU53;
 						ProvisioningStyle = Automatic;
 					};
 					FF37C53F4509A3CADAB0972D = {
@@ -975,6 +987,7 @@
 				E8371E015813A87358832A05 /* WatchRootView.swift in Sources */,
 				D6F9EA93FF97CD4FA3D0BE75 /* WatchSetLoggingView.swift in Sources */,
 				FE70D175AC133AA6ACAA602A /* WatchTodayView.swift in Sources */,
+				A8F4B51CA577862E72E75FBA /* WatchWorkoutIntents.swift in Sources */,
 				F17CF5A434FD302A18E9B830 /* WatchWorkoutSession.swift in Sources */,
 				8AD48581FF99C64E9C4B02FB /* WidgetSnapshot.swift in Sources */,
 				E880F20ADB056FDB47562C04 /* Workout.swift in Sources */,
@@ -1211,7 +1224,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GymTwin/GymTwin.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = R68833AU53;
 				INFOPLIST_FILE = GymTwin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1230,7 +1242,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = GymTwin/GymTwin.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = R68833AU53;
 				INFOPLIST_FILE = GymTwin/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

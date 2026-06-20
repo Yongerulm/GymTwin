@@ -21,9 +21,7 @@ struct WatchSetLoggingView: View {
     @State private var reps: Int = 10
     @FocusState private var focusedField: Field?
 
-    // Rest timer
-    @State private var restSeconds: Int = 0
-    @State private var isResting: Bool = false
+    // Rest timer lives in the store so the Action Button intent shares it.
 
     // Finish confirmation
     @State private var showFinishConfirm = false
@@ -68,7 +66,7 @@ struct WatchSetLoggingView: View {
                 }
 
                 // Rest timer (shown after a set is logged)
-                if isResting {
+                if store.isResting {
                     restTimerRow
                 }
 
@@ -207,8 +205,7 @@ struct WatchSetLoggingView: View {
                 .foregroundStyle(DS.Palette.rest)
             Spacer()
             Button("Skip") {
-                isResting = false
-                restSeconds = 0
+                store.skipRest()
             }
             .font(.system(size: 11, weight: .medium))
             .foregroundStyle(.secondary)
@@ -299,6 +296,8 @@ struct WatchSetLoggingView: View {
     }
 
     private func prefill() {
+        // Mark this as the active exercise so the Action Button logs against it.
+        store.currentExerciseIndex = exerciseIndex
         if let prev = previousSet {
             weight = prev.weight
             reps = prev.repetitions
@@ -306,26 +305,14 @@ struct WatchSetLoggingView: View {
     }
 
     private func logSet() {
+        store.currentExerciseIndex = exerciseIndex
         store.addSet(weight: weight, reps: reps, toExerciseAt: exerciseIndex)
         // Haptic feedback
         WKInterfaceDevice.current().play(.success)
-        // Start rest timer
-        isResting = true
-        restSeconds = 0
-        startRestTimer()
+        // Start the shared rest countdown (also driven by the Action Button)
+        store.startRest()
         // Focus back to weight for next set
         focusedField = .weight
-    }
-
-    private func startRestTimer() {
-        Task { [self] in
-            while isResting {
-                try? await Task.sleep(for: .seconds(1))
-                await MainActor.run {
-                    restSeconds += 1
-                }
-            }
-        }
     }
 
     private var elapsedFormatted: String {
@@ -335,8 +322,8 @@ struct WatchSetLoggingView: View {
     }
 
     private var restFormatted: String {
-        let m = restSeconds / 60
-        let s = restSeconds % 60
+        let m = store.restRemaining / 60
+        let s = store.restRemaining % 60
         return String(format: "%d:%02d", m, s)
     }
 }
