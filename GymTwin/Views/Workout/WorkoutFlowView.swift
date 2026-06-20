@@ -23,6 +23,11 @@ struct WorkoutFlowView: View {
     @State private var manualCode = ""
     @State private var showingFinishConfirm = false
     @State private var showingRestTimer = false
+    // Sticky in-session rest: countdown lives here (not in a sheet) so it stays
+    // glanceable above the action bar between sets.
+    @State private var restActive = false
+    @State private var restRemaining = 0
+    @State private var restTask: Task<Void, Never>?
     @State private var summary: SessionSummaryData?
     /// Exercise pending a remove confirmation (prevents accidental deletion).
     @State private var pendingRemoveID: UUID?
@@ -60,7 +65,11 @@ struct WorkoutFlowView: View {
             .toolbar { toolbarItems }
             .background(GymBackground().ignoresSafeArea())
             .safeAreaInset(edge: .bottom) {
-                if programChosen { bottomBar }
+                VStack(spacing: 0) {
+                    if restActive { restStrip }
+                    if programChosen { bottomBar }
+                }
+                .animation(DS.Motion.spring, value: restActive)
             }
             .overlay(alignment: .top) { detectionBanner }
         }
@@ -86,7 +95,7 @@ struct WorkoutFlowView: View {
         .onChange(of: continuousScan) { _, isOn in
             if isOn { armContinuousScan() } else { scanTask?.cancel(); scanTask = nil }
         }
-        .onDisappear { scanTask?.cancel(); scanTask = nil }
+        .onDisappear { scanTask?.cancel(); scanTask = nil; restTask?.cancel() }
         .sheet(item: $setEntryTarget) { target in
             WorkoutSetEntryView(
                 exerciseName: target.exerciseName,
@@ -372,10 +381,11 @@ struct WorkoutFlowView: View {
                         isActive: index == activeExerciseIndex,
                         lastSession: model.lastSession(forMachineID: exercise.machineID),
                         onCompleteSet: exercise.targetWeight != nil ? { completePlannedSet(at: index) } : nil,
-                        onLogSet: { weight, reps in
-                            model.addSet(weight: weight, reps: reps, type: .working, toExerciseAt: index)
-                            showingRestTimer = true
+                        onLogSet: { weight, reps, type in
+                            model.addSet(weight: weight, reps: reps, type: type, toExerciseAt: index)
+                            startRest()
                         },
+                        coachHint: index == activeExerciseIndex ? coachHint(forMachineID: exercise.machineID) : nil,
                         onAddSet: {
                             let last = exercise.sets.last
                             setEntryTarget = SetEntryTarget(
@@ -390,7 +400,7 @@ struct WorkoutFlowView: View {
                             // Copy the last set (weight + reps) and start the
                             // rest/pause timer, so repeated sets are one tap.
                             if model.repeatLastSet(forExerciseAt: index) != nil {
-                                showingRestTimer = true
+                                startRest()
                             }
                         },
                         onRemoveSet: { setID in
@@ -442,13 +452,21 @@ struct WorkoutFlowView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// One-line progressive-overload nudge for the active exercise, or nil when
+    /// there's no history to reason about yet.
+    private func coachHint(forMachineID id: UUID) -> String? {
+        let coach = CoachService(context: modelContext)
+        guard !coach.history(forMachineID: id).isEmpty else { return nil }
+        return coach.progression(forMachineID: id, goal: .muscleGain).message
+    }
+
     /// Log a set at the exercise's predefined target and start the rest timer.
     private func completePlannedSet(at index: Int) {
         guard model.exercises.indices.contains(index),
               let weight = model.exercises[index].targetWeight,
               let reps = model.exercises[index].targetReps else { return }
         model.addSet(weight: weight, reps: reps, type: .working, toExerciseAt: index)
-        showingRestTimer = true
+        startRest()
     }
 
     // MARK: - Add machine button
@@ -476,9 +494,75 @@ struct WorkoutFlowView: View {
 
     // MARK: - Rest timer toggle
 
+    // MARK: - Sticky rest strip
+
+    private var restTimeString: String {
+        String(format: "%d:%02d", restRemaining / 60, restRemaining % 60)
+    }
+
+    /// Start the inline rest countdown from the user's preferred length.
+    private func startRest() {
+        restTask?.cancel()
+        restRemaining = max(5, restDuration)
+        restActive = true
+        restTask = Task { @MainActor in
+            while restRemaining > 0 && !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                if Task.isCancelled { break }
+                restRemaining -= 1
+            }
+            if !Task.isCancelled { restActive = false }
+        }
+    }
+
+    private func skipRest() {
+        restTask?.cancel(); restTask = nil
+        restActive = false; restRemaining = 0
+    }
+
+    private func extendRest(_ seconds: Int) {
+        restRemaining = max(0, restRemaining + seconds)
+        if restRemaining == 0 { skipRest() }
+    }
+
+    /// Glanceable rest countdown shown above the action bar while resting.
+    private var restStrip: some View {
+        HStack(spacing: DS.Spacing.md) {
+            Image(systemName: "timer").font(.headline).foregroundStyle(DS.Palette.rest)
+            VStack(alignment: .leading, spacing: 0) {
+                Text("REST").font(.caption2.weight(.bold)).tracking(1).foregroundStyle(DS.Palette.rest)
+                Text(restTimeString)
+                    .font(.title3.weight(.bold)).monospacedDigit()
+                    .contentTransition(.numericText())
+            }
+            Spacer()
+            Button { extendRest(15) } label: {
+                Text("+15s").font(.subheadline.weight(.bold)).foregroundStyle(DS.Palette.rest)
+                    .padding(.horizontal, DS.Spacing.md).padding(.vertical, DS.Spacing.sm)
+                    .background(DS.Palette.rest.opacity(0.16), in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Add 15 seconds")
+            Button { skipRest() } label: {
+                Text("Skip").font(.subheadline.weight(.bold)).foregroundStyle(.white)
+                    .padding(.horizontal, DS.Spacing.lg).padding(.vertical, DS.Spacing.sm)
+                    .background(DS.Palette.rest, in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Skip rest and continue")
+        }
+        .padding(.horizontal, DS.Spacing.lg)
+        .padding(.vertical, DS.Spacing.sm)
+        .background(.regularMaterial)
+        .overlay(Rectangle().fill(DS.Palette.rest.opacity(0.25)).frame(height: 1), alignment: .top)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Resting, \(restTimeString) remaining")
+    }
+
     private var restTimerToggle: some View {
         Button {
-            showingRestTimer = true
+            startRest()
         } label: {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "timer")
@@ -812,7 +896,7 @@ struct WorkoutFlowView: View {
         }
         guard let idx = model.exercises.firstIndex(where: { $0.machineID == target.machineID }) else { return }
         model.addSet(weight: target.targetWeight, reps: target.targetReps, type: .working, toExerciseAt: idx)
-        showingRestTimer = true
+        startRest()
     }
 
     @ViewBuilder
@@ -905,8 +989,10 @@ private struct ExerciseSessionCard: View {
     let lastSession: WorkoutExercise?
     /// Logs a set at the predefined target (plan exercises only).
     var onCompleteSet: (() -> Void)? = nil
-    /// Logs a set inline (weight, reps) without opening the modal sheet.
-    var onLogSet: ((Double, Int) -> Void)? = nil
+    /// Logs a set inline (weight, reps, type) without opening the modal sheet.
+    var onLogSet: ((Double, Int, WorkoutSetType) -> Void)? = nil
+    /// One-line coaching nudge for the active exercise (e.g. "Add 2.5 kg").
+    var coachHint: String? = nil
     let onAddSet: () -> Void
     let onRepeatSet: () -> Void
     let onRemoveSet: (UUID) -> Void
@@ -916,6 +1002,7 @@ private struct ExerciseSessionCard: View {
     @State private var showInline = false
     @State private var inlineWeight: Double = 0
     @State private var inlineReps: Int = 0
+    @State private var inlineType: WorkoutSetType = .working
 
     private func fmtWeight(_ w: Double) -> String {
         w == w.rounded() ? String(Int(w)) : String(format: "%.1f", w)
@@ -971,6 +1058,20 @@ private struct ExerciseSessionCard: View {
                             .frame(width: 36, height: 36)
                     }
                     .accessibilityLabel("Remove \(exercise.machineName) from session")
+                }
+
+                // In-set coaching nudge (active exercise only).
+                if let coachHint {
+                    HStack(spacing: DS.Spacing.xs) {
+                        Image(systemName: "sparkles").font(.caption).foregroundStyle(DS.Palette.accent)
+                        Text(coachHint).font(.caption.weight(.semibold)).foregroundStyle(DS.Palette.accent)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, DS.Spacing.sm)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(DS.Palette.accent.opacity(0.10), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                    .accessibilityLabel("Coach: \(coachHint)")
                 }
 
                 // Predefined plan target + one-tap Complete Set.
@@ -1089,6 +1190,25 @@ private struct ExerciseSessionCard: View {
 
     private var inlineEditor: some View {
         VStack(spacing: DS.Spacing.sm) {
+            // Set type quick-pick (warm-up, working, drop set, superset, AMRAP…).
+            Menu {
+                ForEach(WorkoutSetType.allCases, id: \.self) { type in
+                    Button {
+                        inlineType = type
+                    } label: {
+                        Label(type.label, systemImage: inlineType == type ? "checkmark" : "")
+                    }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(inlineType.label).font(.caption.weight(.bold))
+                    Image(systemName: "chevron.up.chevron.down").font(.caption2)
+                }
+                .foregroundStyle(inlineType == .working ? Color.secondary : DS.Palette.accentSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .accessibilityLabel("Set type: \(inlineType.label)")
+
             HStack(spacing: DS.Spacing.md) {
                 inlineStepper(label: "kg", value: fmtWeight(inlineWeight),
                               dec: { inlineWeight = max(0, inlineWeight - 2.5) },
@@ -1099,7 +1219,7 @@ private struct ExerciseSessionCard: View {
             }
             HStack(spacing: DS.Spacing.sm) {
                 Button {
-                    onLogSet?(inlineWeight, inlineReps)
+                    onLogSet?(inlineWeight, inlineReps, inlineType)
                     withAnimation(DS.Motion.snappy) { showInline = false }
                 } label: {
                     Label("Log", systemImage: "checkmark.circle.fill")
