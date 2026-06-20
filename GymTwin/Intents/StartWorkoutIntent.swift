@@ -5,7 +5,7 @@ import AppIntents
 /// app consumes the flag on activation and presents the workout flow.
 struct StartWorkoutIntent: AppIntent {
     static var title: LocalizedStringResource { "Start Workout" }
-    static var description: IntentDescription { IntentDescription("Starts a new training session in FitPilot AI.") }
+    static var description: IntentDescription { IntentDescription("Starts a new training session in Gym Twin.") }
     static var openAppWhenRun: Bool { true }
 
     @MainActor

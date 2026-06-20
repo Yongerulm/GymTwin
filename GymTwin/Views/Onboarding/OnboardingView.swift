@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// First-run welcome: three quick pages that establish what FitPilot does and
+/// First-run welcome: three quick pages that establish what Gym Twin does and
 /// how to start, so a new user reaches first value fast. Shown once
 /// (gated by `@AppStorage("has.onboarded")`), then dismissed.
 struct OnboardingView: View {
@@ -9,7 +9,7 @@ struct OnboardingView: View {
     @State private var page = 0
 
     private let pages: [(icon: String, title: String, body: String)] = [
-        ("bolt.heart.fill", "Welcome to FitPilot",
+        ("bolt.heart.fill", "Welcome to Gym Twin",
          "Your gym's digital twin. Build a plan once, then just train — your weights and targets are always one tap away."),
         ("wave.3.right", "Tap to load a machine",
          "Hold your iPhone to a machine's NFC tag (or scan its code) and your predefined set loads instantly, ready to log."),

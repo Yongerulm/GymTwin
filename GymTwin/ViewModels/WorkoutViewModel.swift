@@ -99,7 +99,7 @@ final class WorkoutViewModel {
         isActive = true
         startDate = Date()
         startTimer()
-        WorkoutLiveActivityController.start(gymName: "FitPilot AI", startedAt: startDate)
+        WorkoutLiveActivityController.start(gymName: "Gym Twin", startedAt: startDate)
         WidgetSyncService.setWorkoutActive(true)
     }
 

@@ -13,7 +13,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>FitPilot AI</string>
+	<string>Gym Twin</string>
 	<key>CFBundleName</key>
 	<string>GymTwin</string>
 	<key>UIUserInterfaceStyle</key>

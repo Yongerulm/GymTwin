@@ -661,13 +661,7 @@ struct WorkoutFlowView: View {
     @ToolbarContentBuilder
     private var toolbarItems: some ToolbarContent {
         if programChosen {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Label(timerString, systemImage: "timer")
-                    .font(.subheadline.weight(.semibold).monospacedDigit())
-                    .foregroundStyle(DS.Palette.accent)
-                    .contentTransition(.numericText())
-                    .animation(.default, value: model.elapsedSeconds)
-            }
+            // Elapsed time is shown in the centre title; no duplicate leading item.
             ToolbarItem(placement: .navigationBarTrailing) {
                 if NFCService.isAvailable {
                     Button {
