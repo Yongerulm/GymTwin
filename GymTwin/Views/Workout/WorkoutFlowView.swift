@@ -23,6 +23,9 @@ struct WorkoutFlowView: View {
     @State private var manualCode = ""
     @State private var showingFinishConfirm = false
     @State private var showingRestTimer = false
+    @State private var summary: SessionSummaryData?
+    /// Exercise pending a remove confirmation (prevents accidental deletion).
+    @State private var pendingRemoveID: UUID?
     @State private var setEntryTarget: SetEntryTarget?
 
     /// Hands-free mode: keep the NFC reader armed so walking up to a machine
@@ -131,8 +134,7 @@ struct WorkoutFlowView: View {
             titleVisibility: .visible
         ) {
             Button("Save & Finish", role: .none) {
-                model.finish()
-                router.endWorkout()
+                finishWithSummary()
             }
             Button("Discard Session", role: .destructive) {
                 model.reset()
@@ -142,6 +144,59 @@ struct WorkoutFlowView: View {
         } message: {
             Text("Your session will be saved and synced to Health.")
         }
+        .confirmationDialog(
+            "Remove exercise?",
+            isPresented: Binding(get: { pendingRemoveID != nil }, set: { if !$0 { pendingRemoveID = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Remove", role: .destructive) {
+                if let id = pendingRemoveID { model.removeExercise(id: id) }
+                pendingRemoveID = nil
+            }
+            Button("Keep", role: .cancel) { pendingRemoveID = nil }
+        } message: {
+            Text("This removes the exercise and its logged sets from this session.")
+        }
+        .sheet(item: $summary) { data in
+            SessionSummaryView(
+                durationMinutes: data.durationMinutes,
+                exerciseCount: data.exerciseCount,
+                totalSets: data.totalSets,
+                totalVolume: data.totalVolume,
+                volumeDeltaPercent: data.volumeDeltaPercent,
+                newPRs: data.newPRs,
+                streakDays: data.streakDays
+            ) {
+                summary = nil
+                router.endWorkout()
+            }
+            .interactiveDismissDisabled()
+        }
+    }
+
+    // MARK: - Finish with post-session summary
+
+    /// Persist the session, then surface the celebratory summary (the habit
+    /// moment) before returning to the app.
+    private func finishWithSummary() {
+        guard let workout = model.finish() else { router.endWorkout(); return }
+        let service = WorkoutService(context: modelContext)
+        // Volume change vs the previous saved workout.
+        let history = service.allWorkouts()
+        let previous = history.first { $0.id != workout.id }
+        let delta: Double? = {
+            guard let prevVol = previous?.totalVolume, prevVol > 0 else { return nil }
+            return (workout.totalVolume - prevVol) / prevVol * 100
+        }()
+        summary = SessionSummaryData(
+            durationMinutes: max(1, Int(workout.duration / 60)),
+            exerciseCount: workout.exercises.count,
+            totalSets: workout.totalSets,
+            totalVolume: workout.totalVolume,
+            volumeDeltaPercent: delta,
+            newPRs: [],
+            streakDays: service.statistics().currentStreakDays
+        )
     }
 
     // MARK: - Program selection (first step of Start Workout)
@@ -338,7 +393,7 @@ struct WorkoutFlowView: View {
                             model.removeSet(id: setID, fromExerciseAt: index)
                         },
                         onRemoveExercise: {
-                            model.removeExercise(id: exercise.id)
+                            pendingRemoveID = exercise.id
                         }
                     )
                 }

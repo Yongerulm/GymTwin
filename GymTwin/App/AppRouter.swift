@@ -1,12 +1,11 @@
 import SwiftUI
 
-/// Top-level tabs of the iOS app. Five tabs, training-first IA:
-/// Dashboard (home), Workouts (training hub), Scan (fast start),
-/// Analytics (progress), Profile (settings).
+/// Top-level tabs of the iOS app. Four tabs, training-first IA:
+/// Today (home), Train (hub: plans + gym twin), Progress, Profile.
+/// Scanning is folded into Start (Today) and the live session, not a tab.
 enum AppTab: Hashable {
     case dashboard
     case workouts
-    case scan
     case analytics
     case profile
 }

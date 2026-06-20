@@ -77,7 +77,8 @@ struct ProfileView: View {
                     .shadow(color: DS.Palette.accent.opacity(0.4), radius: 18, x: 0, y: 8)
 
                 Text(initials)
-                    .font(.system(.title, design: .rounded).weight(.bold))
+                    .font(.title.weight(.bold))
+                    .fontDesign(.rounded)
                     .foregroundStyle(.white)
             }
             .accessibilityHidden(true)

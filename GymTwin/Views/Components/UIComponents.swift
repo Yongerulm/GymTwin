@@ -81,7 +81,7 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: DS.Spacing.md) {
             Image(systemName: icon)
-                .font(.system(size: 44))
+                .font(.largeTitle)
                 .foregroundStyle(DS.Palette.accentGradient)
             Text(title)
                 .font(.title3.weight(.bold))

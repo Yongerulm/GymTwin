@@ -129,13 +129,19 @@ struct SuggestedSetCard: View {
                 // Big weight × reps
                 HStack(alignment: .lastTextBaseline, spacing: DS.Spacing.sm) {
                     Text(weightText)
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        .font(.largeTitle.weight(.bold))
+                        .fontDesign(.rounded)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
                         .foregroundStyle(DS.Palette.accentGradient)
                     Text("×")
                         .font(.title2)
                         .foregroundStyle(.secondary)
                     Text(repsText)
-                        .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                        .font(.largeTitle.weight(.bold))
+                        .fontDesign(.rounded)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
                         .foregroundStyle(DS.Palette.accentGradient)
                 }
                 .accessibilityLabel("\(weightText) times \(repsText)")

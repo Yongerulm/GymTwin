@@ -32,13 +32,9 @@ struct ProgressDashboardView: View {
         ScrollView {
             LazyVStack(spacing: DS.Spacing.xl) {
                 topMetricsSection
-                readinessSection
+                recoverySection
                 if !model.coachInsight.isEmpty {
                     coachSection
-                }
-                recoverySection
-                if !model.muscleRecovery.isEmpty {
-                    muscleRecoverySection
                 }
                 healthSection
                 weeklyVolumeSection
@@ -103,13 +99,13 @@ struct ProgressDashboardView: View {
         }
     }
 
-    // MARK: - Recovery ring
+    // MARK: - Recovery (readiness hero + recovery score + per-muscle bars)
 
-    // MARK: - Readiness (HRV-led)
-
-    private var readinessSection: some View {
+    private var recoverySection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
-            PremiumSectionHeader("Today's Readiness")
+            PremiumSectionHeader("Recovery", subtitle: "Readiness & muscle status")
+
+            // Hero: HRV-led readiness score
             SurfaceCard {
                 VStack(alignment: .leading, spacing: DS.Spacing.md) {
                     HStack(alignment: .firstTextBaseline, spacing: DS.Spacing.sm) {
@@ -151,18 +147,32 @@ struct ProgressDashboardView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    if model.hrv != nil || model.restingHR != nil || model.sleepHours != nil {
-                        HStack(spacing: DS.Spacing.xl) {
-                            if let hrv = model.hrv { readinessStat("HRV", "\(Int(hrv)) ms") }
-                            if let rhr = model.restingHR { readinessStat("Resting HR", "\(rhr) bpm") }
-                            if let sleep = model.sleepHours { readinessStat("Sleep", String(format: "%.1f h", sleep)) }
-                        }
-                        .padding(.top, DS.Spacing.xs)
+                    // Secondary stats row: HRV / Resting HR / Sleep + Recovery Score inline
+                    HStack(spacing: DS.Spacing.xl) {
+                        if let hrv = model.hrv { readinessStat("HRV", "\(Int(hrv)) ms") }
+                        if let rhr = model.restingHR { readinessStat("Resting HR", "\(rhr) bpm") }
+                        if let sleep = model.sleepHours { readinessStat("Sleep", String(format: "%.1f h", sleep)) }
+                        Spacer()
+                        readinessStat("Recovery", "\(model.recoveryScore) / 100")
+                            .accessibilityLabel("Recovery score \(model.recoveryScore) out of 100")
                     }
+                    .padding(.top, DS.Spacing.xs)
                 }
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Readiness \(model.readiness) of 100, \(model.readinessBand.title). \(model.readinessBand.recommendation)")
+            .accessibilityLabel("Readiness \(model.readiness) of 100, \(model.readinessBand.title). \(model.readinessBand.recommendation). Recovery score \(model.recoveryScore) out of 100.")
+
+            // Per-muscle recovery bars
+            if !model.muscleRecovery.isEmpty {
+                SurfaceCard {
+                    VStack(spacing: DS.Spacing.md) {
+                        ForEach(model.muscleRecovery) { status in
+                            muscleRecoveryRow(status)
+                        }
+                    }
+                }
+                .accessibilityLabel("Muscle recovery by group")
+            }
         }
     }
 
@@ -201,36 +211,6 @@ struct ProgressDashboardView: View {
             }
             .accessibilityElement(children: .combine)
             .accessibilityLabel("AI coach: \(model.coachInsight)")
-        }
-    }
-
-    private var recoverySection: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.md) {
-            PremiumSectionHeader("Recovery", subtitle: "Estimated readiness")
-
-            ProgressRingCard(
-                title: "Recovery Score",
-                progress: Double(model.recoveryScore) / 100,
-                centerValue: "\(model.recoveryScore)",
-                centerLabel: "/ 100",
-                tint: DS.Palette.rest
-            )
-            .accessibilityLabel("Recovery score: \(model.recoveryScore) out of 100")
-        }
-    }
-
-    // MARK: - Muscle recovery (per-group)
-
-    private var muscleRecoverySection: some View {
-        VStack(alignment: .leading, spacing: DS.Spacing.md) {
-            PremiumSectionHeader("Muscle Recovery", subtitle: "Per group, since last session")
-            SurfaceCard {
-                VStack(spacing: DS.Spacing.md) {
-                    ForEach(model.muscleRecovery) { status in
-                        muscleRecoveryRow(status)
-                    }
-                }
-            }
         }
     }
 

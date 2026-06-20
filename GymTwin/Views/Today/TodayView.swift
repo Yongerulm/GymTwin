@@ -167,23 +167,13 @@ struct TodayView: View {
     private var quickActionsSection: some View {
         VStack(spacing: DS.Spacing.md) {
             PremiumSectionHeader("Quick Actions")
+            // Start + Scan live in the hero and the scan row above, so the
+            // quick actions are just navigation shortcuts (no duplicate Start).
             LazyVGrid(
                 columns: [GridItem(.flexible(), spacing: DS.Spacing.md),
                           GridItem(.flexible(), spacing: DS.Spacing.md)],
                 spacing: DS.Spacing.md
             ) {
-                QuickActionButton(
-                    icon: "play.fill",
-                    label: "Start Workout",
-                    tint: DS.Palette.accent
-                ) { router.startWorkout() }
-
-                QuickActionButton(
-                    icon: "qrcode.viewfinder",
-                    label: "Scan Machine",
-                    tint: DS.Palette.accentSecondary
-                ) { showingScanFlow = true }
-
                 QuickActionButton(
                     icon: "dumbbell.fill",
                     label: "Open Gym",

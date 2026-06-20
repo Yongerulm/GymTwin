@@ -11,19 +11,15 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $router.selectedTab) {
             TodayView()
-                .tabItem { Label("Dashboard", systemImage: "bolt.heart.fill") }
+                .tabItem { Label("Today", systemImage: "bolt.heart.fill") }
                 .tag(AppTab.dashboard)
 
             WorkoutsHubView()
-                .tabItem { Label("Workouts", systemImage: "dumbbell.fill") }
+                .tabItem { Label("Train", systemImage: "dumbbell.fill") }
                 .tag(AppTab.workouts)
 
-            ScanTabView()
-                .tabItem { Label("Scan", systemImage: "wave.3.right") }
-                .tag(AppTab.scan)
-
             ProgressDashboardView()
-                .tabItem { Label("Analytics", systemImage: "chart.line.uptrend.xyaxis") }
+                .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
                 .tag(AppTab.analytics)
 
             SettingsView()
