@@ -105,8 +105,10 @@ branding/             Icon/art generation sources (gen.py uses Gemini; .gemini_k
 - **Design system only** — never hardcode colors/spacing. Use `DS.Spacing/Radius/Palette/Muscle/Motion`
   and the component library (`SurfaceCard`, `MachineCard`, `MachineThumbnail`, `MetricCard`,
   `ProgressRingCard`, `MachineSettingChip`, AI cards, `WorkoutControlStepper`, `RestTimerView`, ...).
-- **Dark-locked** premium theme: deep anthracite (`DS.Palette.background`) + `GymBackground` glow;
-  cards on `DS.Palette.surface`. `UIUserInterfaceStyle = Dark`.
+- **Dark-locked** premium theme — **Ember** direction: warm near-black base (`DS.Palette.background`
+  #0A0806) + ember-orange accent (`DS.Palette.accent` #FF6B2C) + rich gradient-coloured body-area
+  tiles (`DS.Muscle.gradient(for:)`); cards on `DS.Palette.surface` #181512. `UIUserInterfaceStyle = Dark`.
+  Colours come from `Color(hex:)`; see the design handoff in Downloads for the full spec.
 - Machine thumbnails resolve to schematic equipment icons via `MachineArt` (`micon-*` assets), falling
   back to the muscle SF Symbol; a user photo always wins.
 - Derived data (PRs, stats, "last session") is computed via `WorkoutService`, never duplicated into state.

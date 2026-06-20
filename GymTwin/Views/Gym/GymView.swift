@@ -428,7 +428,8 @@ private struct AreaCard: View {
             RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
                 .strokeBorder(muscleColor.opacity(0.18), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.18), radius: 14, x: 0, y: 6)
+        // Ember: warm coloured glow per body area.
+        .shadow(color: DS.Muscle.glow(for: area.name).opacity(0.30), radius: 12, x: 0, y: 6)
     }
 
     /// Energetic, muscle-specific hero image with a dark scrim and the area
@@ -442,8 +443,12 @@ private struct AreaCard: View {
                         .resizable()
                         .scaledToFill()
                 } else {
-                    LinearGradient(colors: [muscleColor, muscleColor.opacity(0.4)],
-                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                    // Ember two-stop area gradient with a top white highlight.
+                    DS.Muscle.gradient(for: area.name)
+                        .overlay(alignment: .top) {
+                            LinearGradient(colors: [.white.opacity(0.12), .clear],
+                                           startPoint: .top, endPoint: .center)
+                        }
                 }
             }
             .frame(maxWidth: .infinity)
