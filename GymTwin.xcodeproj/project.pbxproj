@@ -112,6 +112,7 @@
 		BF4C8B07786FAE652F37AE1C /* Gym.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B282E8C1FE7E4A0BDB11628 /* Gym.swift */; };
 		C338FB5ED04B7EF3F57CF1B9 /* GymTwinWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0ED5E529EF397BA8482673 /* GymTwinWatchApp.swift */; };
 		C631251758096A62DE6DE357 /* Machine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11433399223181D93E103050 /* Machine.swift */; };
+		C6E290CC7272A79FF2F60C67 /* NFCWriterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AD273DA8C2FAE24288722 /* NFCWriterService.swift */; };
 		C94DFFF3E187A7AE1A9435F4 /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860331DE350DD663AC9DD7AC /* ProgressViewModel.swift */; };
 		CA9E0281C98BDB032A4110EC /* RecoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4082C539BBA6D5AB6DA610E7 /* RecoveryService.swift */; };
 		CC59EB7A621C11C745879E72 /* ReadinessWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0011BC2C0EA5CEF96A58EB4F /* ReadinessWidget.swift */; };
@@ -240,6 +241,7 @@
 		4C2FF3203ED2FFFA683B6C5C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4C6495BDF9877F15F7D27E0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4ED85C2BB95831EFD138767A /* WatchWorkoutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchWorkoutIntents.swift; sourceTree = "<group>"; };
+		508AD273DA8C2FAE24288722 /* NFCWriterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCWriterService.swift; sourceTree = "<group>"; };
 		50CD4BD7EA0A23300390B367 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		5181065F36E7213EB0105438 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		523CE928FD5D9C2C6DE0ABD5 /* SessionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSummaryView.swift; sourceTree = "<group>"; };
@@ -645,6 +647,7 @@
 			children = (
 				15C12F13D8FA1C7F472AE2C2 /* MachineRecognitionService.swift */,
 				7698C4C0B7281FFA2719F2B2 /* NFCService.swift */,
+				508AD273DA8C2FAE24288722 /* NFCWriterService.swift */,
 			);
 			path = Recognition;
 			sourceTree = "<group>";
@@ -1053,6 +1056,7 @@
 				F572D8CEABEC1A007E347788 /* MachineViewModel.swift in Sources */,
 				3BF0348427193881CF67200E /* MuscleRecoveryService.swift in Sources */,
 				F4C8CD79FAFB5B2B937410EF /* NFCService.swift in Sources */,
+				C6E290CC7272A79FF2F60C67 /* NFCWriterService.swift in Sources */,
 				AAD2E047A97A37AFA30F3E57 /* OnboardingView.swift in Sources */,
 				AF02323B80C81BAE70062CE6 /* OpenSearchMachineRepository.swift in Sources */,
 				82126F3EDC52DCBF39637A05 /* PersistenceController.swift in Sources */,

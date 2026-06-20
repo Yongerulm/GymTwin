@@ -24,6 +24,8 @@ struct MachineDetailView: View {
     @State private var model = MachineViewModel()
     @State private var showingEdit = false
     @State private var showingDeleteAlert = false
+    @State private var writingTag = false
+    @State private var writeResult: String?
     @State private var lastSession: WorkoutExercise?
     @State private var personalRecord: WorkoutSet?
     @State private var history: [WorkoutExercise] = []
@@ -275,43 +277,68 @@ struct MachineDetailView: View {
     // MARK: - NFC / QR identity placeholder
 
     private var nfcPlaceholderRow: some View {
-        HStack(spacing: DS.Spacing.md) {
-            Image(systemName: "wave.3.right.circle")
-                .font(.headline)
-                .foregroundStyle(.tertiary)
-                .frame(width: 36, height: 36)
-                .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+        let code = (machine.machineCode ?? "").trimmingCharacters(in: .whitespaces)
+        let hasCode = !code.isEmpty
+        let canWrite = hasCode && NFCWriterService.isAvailable
 
-            VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                Text("Tap to Identify")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                Text("NFC / QR machine tagging — coming soon")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+        return Button {
+            guard canWrite else { return }
+            writeResult = nil
+            writingTag = true
+            Task {
+                let ok = await NFCWriterService().write(urlString: "gymtwin://machine/\(code)")
+                writingTag = false
+                writeResult = ok
+                    ? "Tag written ✓ — just tap it to load this machine, no scan window."
+                    : "Couldn't write the tag. Hold it steady and try again."
             }
+        } label: {
+            HStack(spacing: DS.Spacing.md) {
+                Image(systemName: "wave.3.right.circle.fill")
+                    .font(.headline)
+                    .foregroundStyle(canWrite ? DS.Palette.accent : Color.secondary)
+                    .frame(width: 36, height: 36)
+                    .background((canWrite ? DS.Palette.accent : Color.gray).opacity(0.12),
+                               in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
 
-            Spacer()
+                VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
+                    Text(writingTag ? "Hold near the tag…" : "Write NFC Tag")
+                        .font(.subheadline.weight(.semibold))
+                    Text(writeResult ?? rowSubtitle(hasCode: hasCode, code: code))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
-            Text("Soon")
-                .font(.caption2.weight(.semibold))
-                .padding(.horizontal, DS.Spacing.sm)
-                .padding(.vertical, DS.Spacing.xxs)
-                .foregroundStyle(.tertiary)
-                .background(.white.opacity(0.05), in: Capsule())
+                Spacer()
+
+                if writingTag {
+                    ProgressView()
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(DS.Spacing.lg)
+            .background(
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                    .fill(DS.Palette.surface)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
+                    .strokeBorder(.white.opacity(0.06), lineWidth: 1)
+            )
         }
-        .padding(DS.Spacing.lg)
-        .background(
-            RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                .fill(DS.Palette.surface)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: DS.Radius.md, style: .continuous)
-                .strokeBorder(.white.opacity(0.04), lineWidth: 1)
-        )
-        .disabled(true)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Tap to identify — NFC and QR machine tagging, coming soon")
+        .buttonStyle(.plain)
+        .disabled(!canWrite || writingTag)
+        .accessibilityLabel(canWrite ? "Write an NFC tag for this machine" : "Set a machine code in Edit first to write a tag")
+    }
+
+    private func rowSubtitle(hasCode: Bool, code: String) -> String {
+        if !NFCWriterService.isAvailable { return "NFC isn't available on this device" }
+        if !hasCode { return "Set a machine code in Edit first" }
+        return "Encodes gymtwin://machine/\(code) — then just tap the tag, no scan window"
     }
 
     // MARK: - History card
