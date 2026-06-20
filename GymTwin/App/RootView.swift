@@ -32,9 +32,20 @@ struct RootView: View {
         .environment(router)
         .environment(gymSelection)
         .fullScreenCover(isPresented: $router.isWorkoutActive) {
-            WorkoutFlowView(initialMachineID: router.workoutMachineID, scanMode: router.workoutScanMode)
-                .environment(router)
-                .environment(gymSelection)
+            WorkoutFlowView(
+                initialMachineID: router.workoutMachineID,
+                scanMode: router.workoutScanMode,
+                planID: router.workoutPlanID,
+                scanCode: router.workoutScanCode
+            )
+            .environment(router)
+            .environment(gymSelection)
+        }
+        .onOpenURL { url in
+            // Background NFC tag: gymtwin://machine/<code> → load that machine.
+            guard url.scheme == "gymtwin", url.host == "machine" else { return }
+            let code = url.lastPathComponent
+            if !code.isEmpty, code != "machine" { router.startWorkout(scanCode: code) }
         }
         .fullScreenCover(isPresented: Binding(get: { !hasOnboarded }, set: { if $0 == false { hasOnboarded = true } })) {
             OnboardingView { hasOnboarded = true }

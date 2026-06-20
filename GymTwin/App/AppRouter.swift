@@ -29,12 +29,35 @@ final class AppRouter {
     /// When true the flow skips the program picker and starts in free /
     /// scan-first mode (used by the dedicated Scan tab).
     var workoutScanMode = false
+    /// When set, the flow loads this plan directly and skips the picker.
+    var workoutPlanID: String?
+    /// Machine code from a background NFC tag deep link (gymtwin://machine/<code>).
+    var workoutScanCode: String?
+
+    /// Start a session from a tapped NFC tag (no system scan sheet): loads the
+    /// machine for the given code into a fresh session.
+    func startWorkout(scanCode: String) {
+        workoutMachineID = nil
+        workoutScanMode = false
+        workoutPlanID = nil
+        workoutScanCode = scanCode
+        isWorkoutActive = true
+    }
 
     /// Start a workout from anywhere. With no machine it opens the program
     /// picker first; pre-selecting a machine skips straight into the session.
     func startWorkout(machineID: UUID? = nil) {
         workoutMachineID = machineID
         workoutScanMode = false
+        workoutPlanID = nil
+        isWorkoutActive = true
+    }
+
+    /// Start a workout directly on a chosen plan (skips the program picker).
+    func startWorkout(planID: String) {
+        workoutMachineID = nil
+        workoutScanMode = false
+        workoutPlanID = planID
         isWorkoutActive = true
     }
 
@@ -42,6 +65,7 @@ final class AppRouter {
     func startScan() {
         workoutMachineID = nil
         workoutScanMode = true
+        workoutPlanID = nil
         isWorkoutActive = true
     }
 
@@ -49,6 +73,8 @@ final class AppRouter {
         isWorkoutActive = false
         workoutMachineID = nil
         workoutScanMode = false
+        workoutPlanID = nil
+        workoutScanCode = nil
     }
 
     /// Jump to the Workouts hub (which hosts the gym digital twin).

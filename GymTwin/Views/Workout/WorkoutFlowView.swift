@@ -7,6 +7,10 @@ struct WorkoutFlowView: View {
     let initialMachineID: UUID?
     /// Scan-first entry (Scan tab): skip the program picker, train freely.
     var scanMode: Bool = false
+    /// When set, load this plan directly and skip the program picker.
+    var planID: String? = nil
+    /// Machine code from a background NFC tag — loads that machine on launch.
+    var scanCode: String? = nil
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
@@ -49,6 +53,10 @@ struct WorkoutFlowView: View {
     @State private var detectedMachineName: String?
     @State private var detectBannerTask: Task<Void, Never>?
 
+    /// Today's readiness (HRV + sleep led), loaded once when the session starts.
+    @State private var readiness: Int?
+    @State private var readinessDismissed = false
+
     var body: some View {
         NavigationStack {
             Group {
@@ -75,7 +83,16 @@ struct WorkoutFlowView: View {
         }
         .task {
             model.bind(modelContext)
-            if let id = initialMachineID {
+            if let code = scanCode {
+                // Launched from a background NFC tag — load that machine directly.
+                if !model.isActive { model.start() }
+                activePlanID = ""
+                programChosen = true
+                await loadScannedMachine(rawCode: code)
+            } else if let pid = planID, let plan = plans.first(where: { $0.id.uuidString == pid }) {
+                // Launched directly on a chosen plan — load it, skip the picker.
+                chooseProgram(plan)
+            } else if let id = initialMachineID {
                 // Started from a specific machine — skip the picker.
                 if !model.isActive { model.start() }
                 model.addExerciseByID(id)
@@ -94,6 +111,10 @@ struct WorkoutFlowView: View {
         }
         .onChange(of: continuousScan) { _, isOn in
             if isOn { armContinuousScan() } else { scanTask?.cancel(); scanTask = nil }
+        }
+        .onChange(of: programChosen) { _, chosen in
+            // When a session begins, read today's recovery to suggest intensity.
+            if chosen { Task { await loadReadiness() } }
         }
         .onDisappear { scanTask?.cancel(); scanTask = nil; restTask?.cancel() }
         .sheet(item: $setEntryTarget) { target in
@@ -368,6 +389,10 @@ struct WorkoutFlowView: View {
     private var sessionContent: some View {
         ScrollView {
             VStack(spacing: DS.Spacing.lg) {
+                // Readiness suggestion at the start of the session.
+                if let score = readiness, let band = readinessBand, !readinessDismissed {
+                    readinessBanner(score, band)
+                }
                 // Slim plan progress header (no duplicated banner card).
                 if let plan = activePlan {
                     planProgressHeader(plan)
@@ -425,6 +450,86 @@ struct WorkoutFlowView: View {
     }
 
     // MARK: - Plan progress + complete planned set
+
+    // MARK: - Readiness (intensity suggestion at start)
+
+    private var readinessBand: ReadinessBand? { readiness.map { ReadinessBand.from($0) } }
+
+    /// Read sleep + HRV (+ resting HR & recent load) from HealthKit and compute
+    /// today's readiness, so the session can suggest doing a bit more or less.
+    private func loadReadiness() async {
+        guard readiness == nil else { return }
+        let hk = HealthKitService.shared
+        guard hk.isAvailable else { return }
+        await hk.requestAuthorization()
+        async let hrv = hk.latestHRV()
+        async let sleep = hk.lastNightSleepHours()
+        async let rest = hk.restingHeartRate()
+        let (h, s, r) = await (hrv, sleep, rest)
+        let weekCount = WorkoutService(context: modelContext).statistics().workoutsThisWeek
+        readiness = RecoveryService.readiness(
+            hrvMs: h,
+            restingHR: r.map { Int($0.rounded()) },
+            sleepHours: s,
+            workoutsLast7Days: weekCount
+        )
+    }
+
+    private var readinessColor: Color {
+        switch readinessBand {
+        case .low: return DS.Palette.warning
+        case .moderate: return DS.Palette.record
+        case .high: return DS.Palette.success
+        case .peak, .none: return DS.Palette.accent
+        }
+    }
+
+    /// Banner shown at the top of a plan session with today's readiness and a
+    /// one-tap adjustment to the planned volume.
+    @ViewBuilder
+    private func readinessBanner(_ score: Int, _ band: ReadinessBand) -> some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                HStack(spacing: DS.Spacing.sm) {
+                    Image(systemName: "heart.text.square.fill").foregroundStyle(readinessColor)
+                    Text("Today's readiness").font(.subheadline.weight(.bold))
+                    Spacer()
+                    Text("\(score)").font(.headline.weight(.heavy)).monospacedDigit().foregroundStyle(readinessColor)
+                    Text("/ 100").font(.caption).foregroundStyle(.secondary)
+                    Button { readinessDismissed = true } label: {
+                        Image(systemName: "xmark").font(.caption.weight(.bold)).foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Dismiss readiness")
+                }
+                Text(band.recommendation).font(.caption).foregroundStyle(.secondary)
+
+                // Offer a matching volume adjustment for low / peak days.
+                if band == .low {
+                    adjustButton(title: "Take it lighter — drop a set each", systemImage: "minus.circle.fill") {
+                        model.adjustAllTargetSets(by: -1)
+                    }
+                } else if band == .peak {
+                    adjustButton(title: "Feeling strong — add a set each", systemImage: "plus.circle.fill") {
+                        model.adjustAllTargetSets(by: 1)
+                    }
+                }
+            }
+        }
+        .overlay(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).strokeBorder(readinessColor.opacity(0.3), lineWidth: 1))
+    }
+
+    private func adjustButton(title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button { action(); readinessDismissed = true } label: {
+            Label(title, systemImage: systemImage)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DS.Spacing.sm)
+                .background(readinessColor, in: Capsule())
+        }
+        .buttonStyle(.plain)
+    }
 
     /// Index of the current exercise to train: the first one whose predefined
     /// target sets aren't met yet (plan exercises only).

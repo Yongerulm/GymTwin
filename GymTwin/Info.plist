@@ -47,5 +47,16 @@
 	<string>Gym Twin reads your heart rate and body metrics to enrich your workout summaries.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Gym Twin saves your strength-training workouts, duration and active energy to Apple Health.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.markusvaitl.gymtwin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gymtwin</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

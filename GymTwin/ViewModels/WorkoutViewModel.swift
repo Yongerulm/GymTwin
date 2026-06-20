@@ -238,6 +238,14 @@ final class WorkoutViewModel {
         syncLiveActivity()
     }
 
+    /// Scale every planned exercise's target set count by `delta` (clamped to
+    /// at least 1) — used to adapt the session to today's readiness.
+    func adjustAllTargetSets(by delta: Int) {
+        for i in exercises.indices where exercises[i].targetSets != nil {
+            exercises[i].targetSets = max(1, (exercises[i].targetSets ?? 1) + delta)
+        }
+    }
+
     func removeExercise(at offsets: IndexSet) {
         exercises.remove(atOffsets: offsets)
     }

@@ -7,6 +7,7 @@ import SwiftData
 /// the NFC scan flow loads targets from), and opens the builder.
 struct PlansListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
     @Query(sort: \WorkoutPlan.sortIndex) private var plans: [WorkoutPlan]
     @AppStorage("active.plan.id") private var activePlanID: String = ""
 
@@ -76,6 +77,18 @@ struct PlansListView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
+                // Train this plan now (skips the program picker).
+                Button {
+                    activePlanID = plan.id.uuidString
+                    router.startWorkout(planID: plan.id.uuidString)
+                } label: {
+                    Image(systemName: "play.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(DS.Palette.accentGradient)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Start training with \(plan.name)")
+
                 Button { editingPlan = plan } label: {
                     Image(systemName: "slider.horizontal.3").foregroundStyle(DS.Palette.accent)
                 }
