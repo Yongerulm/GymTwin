@@ -12,6 +12,7 @@ struct PlansListView: View {
 
     @State private var creating = false
     @State private var editingPlan: WorkoutPlan?
+    @State private var duplicating: WorkoutPlan?
 
     var body: some View {
         ScrollView {
@@ -51,6 +52,7 @@ struct PlansListView: View {
         }
         .sheet(isPresented: $creating) { PlanBuilderView() }
         .sheet(item: $editingPlan) { PlanBuilderView(plan: $0) }
+        .sheet(item: $duplicating) { PlanBuilderView(basedOn: $0) }
     }
 
     private func isActive(_ plan: WorkoutPlan) -> Bool { plan.id.uuidString == activePlanID }
@@ -82,6 +84,9 @@ struct PlansListView: View {
             }
         }
         .contextMenu {
+            Button { duplicating = plan } label: {
+                Label("Duplicate as new plan", systemImage: "doc.on.doc")
+            }
             Button(role: .destructive) {
                 if isActive(plan) { activePlanID = "" }
                 modelContext.delete(plan)
@@ -100,13 +105,23 @@ struct PlanBuilderView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(GymSelection.self) private var gymSelection
     @Query private var gyms: [Gym]
+    @Query(sort: \WorkoutPlan.sortIndex) private var allPlans: [WorkoutPlan]
 
     private let editing: WorkoutPlan?
-    init(plan: WorkoutPlan? = nil) { self.editing = plan }
+    /// When set (and not editing), the builder starts pre-filled from this plan
+    /// as a *new* plan — the basis for splits like Upper / Lower.
+    private let template: WorkoutPlan?
+    init(plan: WorkoutPlan? = nil, basedOn template: WorkoutPlan? = nil) {
+        self.editing = plan
+        self.template = template
+    }
 
     @State private var name = ""
     @State private var items: [Draft] = []
     @State private var showingPicker = false
+    /// Cross-plan target changes awaiting the user's "apply to all?" decision.
+    @State private var pendingPropagation: [PropagationTarget] = []
+    @State private var showingPropagateConfirm = false
 
     struct Draft: Identifiable {
         let id = UUID()
@@ -118,10 +133,36 @@ struct PlanBuilderView: View {
         var weight: Double
     }
 
+    /// A changed machine target to optionally apply across all other plans.
+    struct PropagationTarget: Identifiable {
+        var id: UUID { machineID }
+        let machineID: UUID
+        let sets: Int
+        let reps: Int
+        let weight: Double
+    }
+
     var body: some View {
         NavigationStack {
             Form {
                 Section { TextField("Plan name (e.g. Push Day)", text: $name) }
+
+                // Start a new plan from an existing one (basis for splits).
+                if editing == nil, !basablePlans.isEmpty {
+                    Section {
+                        Menu {
+                            ForEach(basablePlans) { plan in
+                                Button(plan.name) { loadFrom(plan) }
+                            }
+                        } label: {
+                            Label(items.isEmpty ? "Base on an existing plan" : "Replace with another plan",
+                                  systemImage: "doc.on.doc")
+                                .foregroundStyle(DS.Palette.accent)
+                        }
+                    } footer: {
+                        Text("Loads that plan's machines and targets so you can tweak them into a new plan.")
+                    }
+                }
 
                 Section("Machines") {
                     ForEach($items) { $item in
@@ -159,8 +200,23 @@ struct PlanBuilderView: View {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
             }
             .sheet(isPresented: $showingPicker) { machinePicker }
-            .task { loadIfEditing() }
+            .task { loadInitial() }
+            .confirmationDialog(
+                "Apply to all plans?",
+                isPresented: $showingPropagateConfirm,
+                titleVisibility: .visible
+            ) {
+                Button("Apply everywhere") { applyPropagation(); dismiss() }
+                Button("Only this plan") { dismiss() }
+            } message: {
+                Text("You changed targets for \(pendingPropagation.count) machine\(pendingPropagation.count == 1 ? "" : "s") that other plans also use. Update those plans too, so they stay in sync?")
+            }
         }
+    }
+
+    /// Plans that can serve as a basis (everything except the one being edited).
+    private var basablePlans: [WorkoutPlan] {
+        allPlans.filter { $0.id != editing?.id }
     }
 
     private var activeGym: Gym? { gymSelection.activeGym(from: gyms) }
@@ -207,16 +263,37 @@ struct PlanBuilderView: View {
         w == w.rounded() ? String(Int(w)) : String(format: "%.1f", w)
     }
 
-    private func loadIfEditing() {
-        guard let editing, items.isEmpty, name.isEmpty else { return }
-        name = editing.name
-        items = editing.sortedExercises.map {
+    private func loadInitial() {
+        guard items.isEmpty, name.isEmpty else { return }
+        if let editing {
+            name = editing.name
+            items = drafts(from: editing)
+        } else if let template {
+            name = "\(template.name) Copy"
+            items = drafts(from: template)
+        }
+    }
+
+    /// Load machines + targets from another plan into the current draft.
+    private func loadFrom(_ plan: WorkoutPlan) {
+        if name.trimmingCharacters(in: .whitespaces).isEmpty {
+            name = "\(plan.name) Copy"
+        }
+        items = drafts(from: plan)
+    }
+
+    private func drafts(from plan: WorkoutPlan) -> [Draft] {
+        plan.sortedExercises.map {
             Draft(machineID: $0.machineID, machineName: $0.machineName, machineCode: $0.machineCode,
                   sets: $0.targetSets, reps: $0.targetReps, weight: $0.targetWeight)
         }
     }
 
     private func save() {
+        // Detect target changes vs the original (editing only), so we can offer
+        // to keep the same machine's target in sync across other plans.
+        let changes = editing.map { changedTargets(original: $0) } ?? []
+
         let plan: WorkoutPlan
         if let editing {
             plan = editing
@@ -233,6 +310,48 @@ struct PlanBuilderView: View {
                          targetSets: draft.sets, targetReps: draft.reps, targetWeight: draft.weight, sortIndex: idx)
         }
         try? modelContext.save()
-        dismiss()
+
+        // Only offer propagation for changed machines that other plans also use.
+        let propagatable = changes.filter { change in
+            allPlans.contains { other in
+                other.id != plan.id && other.exercises.contains { $0.machineID == change.machineID }
+            }
+        }
+        if propagatable.isEmpty {
+            dismiss()
+        } else {
+            pendingPropagation = propagatable
+            showingPropagateConfirm = true   // dismissal happens from the dialog
+        }
+    }
+
+    /// Targets that changed vs the original plan, for machines that appear
+    /// exactly once here (unambiguous to propagate).
+    private func changedTargets(original: WorkoutPlan) -> [PropagationTarget] {
+        let counts = Dictionary(grouping: items, by: \.machineID).mapValues(\.count)
+        var result: [PropagationTarget] = []
+        for draft in items where counts[draft.machineID] == 1 {
+            guard let old = original.exercises.first(where: { $0.machineID == draft.machineID }) else { continue }
+            let changed = old.targetSets != draft.sets || old.targetReps != draft.reps || old.targetWeight != draft.weight
+            if changed {
+                result.append(PropagationTarget(machineID: draft.machineID, sets: draft.sets, reps: draft.reps, weight: draft.weight))
+            }
+        }
+        return result
+    }
+
+    /// Apply the pending target changes to every other plan that uses each
+    /// machine, keeping the gym's plans in sync.
+    private func applyPropagation() {
+        for change in pendingPropagation {
+            for plan in allPlans where plan.id != editing?.id {
+                for ex in plan.exercises where ex.machineID == change.machineID {
+                    ex.targetSets = change.sets
+                    ex.targetReps = change.reps
+                    ex.targetWeight = change.weight
+                }
+            }
+        }
+        try? modelContext.save()
     }
 }
