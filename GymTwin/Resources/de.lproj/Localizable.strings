@@ -444,3 +444,16 @@
 "Circuit" = "Zirkel";
 "Timed" = "Auf Zeit";
 "Cluster" = "Cluster";
+
+// MARK: - Coach (DeterministicWorkoutCoach)
+"Log a set to calibrate your first recommendation." = "Logge einen Satz, um deine erste Empfehlung zu kalibrieren.";
+"You hit %lld reps — add %@ kg and keep progressing." = "%lld Wiederholungen geschafft — leg %@ kg drauf und bleib dran.";
+"Last set fell short of %lld reps — ease back to rebuild clean reps." = "Letzter Satz unter %lld Wiederholungen — reduziere, um saubere Wiederholungen aufzubauen.";
+"Stay at %@ kg until you reach %lld reps." = "Bleib bei %@ kg, bis du %lld Wiederholungen erreichst.";
+"First session — pick a weight you can control for %lld reps." = "Erste Einheit — wähle ein Gewicht, das du für %lld Wiederholungen kontrollierst.";
+"No history yet." = "Noch keine Historie.";
+"%lld strong sessions — time to add %@ kg." = "%lld starke Einheiten — Zeit, %@ kg draufzulegen.";
+"Keep building reps at %@ kg (%lld/%lld on target)." = "Baue weiter Wiederholungen bei %@ kg auf (%lld/%lld im Ziel).";
+"Weight has dropped three sessions in a row — take a lighter recovery day." = "Gewicht ist drei Einheiten in Folge gefallen — leg einen leichteren Erholungstag ein.";
+"Progress has stalled — a 10% deload often breaks a plateau." = "Fortschritt stagniert — ein 10%-Deload durchbricht oft ein Plateau.";
+"Effort is climbing while reps aren't — ease off to recover." = "Die Anstrengung steigt, die Wiederholungen nicht — geh zurück, um dich zu erholen.";

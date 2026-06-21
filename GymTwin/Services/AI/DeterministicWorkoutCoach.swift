@@ -14,7 +14,7 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
 
     func recommendWeight(lastWeight: Double, lastReps: Int, targetReps: Int) -> WeightRecommendation {
         guard lastWeight > 0 else {
-            return WeightRecommendation(recommendedWeight: 0, change: 0, reason: "Log a set to calibrate your first recommendation.")
+            return WeightRecommendation(recommendedWeight: 0, change: 0, reason: String(localized: "Log a set to calibrate your first recommendation."))
         }
         // Hit (or beat) the target → add the smallest increment.
         if lastReps >= targetReps {
@@ -22,7 +22,7 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
             return WeightRecommendation(
                 recommendedWeight: next,
                 change: next - lastWeight,
-                reason: "You hit \(lastReps) reps — add \(format(Loading.increment)) kg and keep progressing."
+                reason: String(localized: "You hit \(lastReps) reps — add \(format(Loading.increment)) kg and keep progressing.")
             )
         }
         // Fell well short → reduce slightly to rebuild quality reps.
@@ -31,14 +31,14 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
             return WeightRecommendation(
                 recommendedWeight: max(next, Loading.increment),
                 change: next - lastWeight,
-                reason: "Last set fell short of \(targetReps) reps — ease back to rebuild clean reps."
+                reason: String(localized: "Last set fell short of \(targetReps) reps — ease back to rebuild clean reps.")
             )
         }
         // Close to target → hold and earn the reps.
         return WeightRecommendation(
             recommendedWeight: lastWeight,
             change: 0,
-            reason: "Stay at \(format(lastWeight)) kg until you reach \(targetReps) reps."
+            reason: String(localized: "Stay at \(format(lastWeight)) kg until you reach \(targetReps) reps.")
         )
     }
 
@@ -47,7 +47,7 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
     func nextSet(history: [PerformanceSample], goal: TrainingGoal) -> SetRecommendation {
         guard let last = history.last else {
             return SetRecommendation(weight: 0, reps: goal.targetReps, sets: goal.setCount,
-                                     note: "First session — pick a weight you can control for \(goal.targetReps) reps.")
+                                     note: String(localized: "First session — pick a weight you can control for \(goal.targetReps) reps."))
         }
         let rec = recommendWeight(lastWeight: last.weight, lastReps: last.reps, targetReps: goal.targetReps)
         let deload = detectDeload(history: history)
@@ -64,7 +64,7 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
 
     func evaluateProgression(history: [PerformanceSample], targetReps: Int) -> ProgressionAdvice {
         guard let last = history.last else {
-            return ProgressionAdvice(action: .maintain, suggestedWeight: 0, message: "No history yet.")
+            return ProgressionAdvice(action: .maintain, suggestedWeight: 0, message: String(localized: "No history yet."))
         }
         let deload = detectDeload(history: history)
         if deload.isRecommended {
@@ -78,13 +78,13 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
             return ProgressionAdvice(
                 action: .increaseLoad,
                 suggestedWeight: next,
-                message: "\(onTargetStreak) strong sessions — time to add \(format(Loading.increment)) kg."
+                message: String(localized: "\(onTargetStreak) strong sessions — time to add \(format(Loading.increment)) kg.")
             )
         }
         return ProgressionAdvice(
             action: .maintain,
             suggestedWeight: last.weight,
-            message: "Keep building reps at \(format(last.weight)) kg (\(onTargetStreak)/\(sessionsToProgress) on target)."
+            message: String(localized: "Keep building reps at \(format(last.weight)) kg (\(onTargetStreak)/\(sessionsToProgress) on target).")
         )
     }
 
@@ -98,7 +98,7 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
         // Regression: top weight strictly decreasing across the last 3 sessions.
         if recent[0].weight > recent[1].weight, recent[1].weight > recent[2].weight {
             return DeloadSignal(isRecommended: true,
-                                reason: "Weight has dropped three sessions in a row — take a lighter recovery day.",
+                                reason: String(localized: "Weight has dropped three sessions in a row — take a lighter recovery day."),
                                 severity: 2)
         }
         // Stagnation: identical weight for 3+ sessions and reps not improving.
@@ -106,13 +106,13 @@ struct DeterministicWorkoutCoach: AIWorkoutCoach {
         let repsNotImproving = recent[2].reps <= recent[0].reps
         if sameWeight, repsNotImproving {
             return DeloadSignal(isRecommended: true,
-                                reason: "Progress has stalled — a 10% deload often breaks a plateau.",
+                                reason: String(localized: "Progress has stalled — a 10% deload often breaks a plateau."),
                                 severity: 1)
         }
         // Overtraining proxy: rising RPE with flat or falling reps.
         if let r0 = recent[0].rpe, let r2 = recent[2].rpe, r2 >= r0 + 1, recent[2].reps <= recent[0].reps {
             return DeloadSignal(isRecommended: true,
-                                reason: "Effort is climbing while reps aren't — ease off to recover.",
+                                reason: String(localized: "Effort is climbing while reps aren't — ease off to recover."),
                                 severity: 1)
         }
         return .none
