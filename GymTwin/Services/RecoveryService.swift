@@ -134,20 +134,20 @@ enum ReadinessBand: String, Sendable {
 
     var title: String {
         switch self {
-        case .low: return "Take it easy"
-        case .moderate: return "Moderate"
-        case .high: return "Ready"
-        case .peak: return "Peak"
+        case .low: return String(localized: "Take it easy")
+        case .moderate: return String(localized: "Moderate")
+        case .high: return String(localized: "Ready")
+        case .peak: return String(localized: "Peak")
         }
     }
 
     /// Calm, precise coaching line — never hype.
     var recommendation: String {
         switch self {
-        case .low: return "Recovery is low. Prioritise rest, mobility or a light session today."
-        case .moderate: return "You're partly recovered. Keep the intensity moderate and stop a rep short."
-        case .high: return "You're recovered. Train as planned and chase your targets."
-        case .peak: return "Excellent recovery. A good day to push for a personal record."
+        case .low: return String(localized: "Recovery is low. Prioritise rest, mobility or a light session today.")
+        case .moderate: return String(localized: "You're partly recovered. Keep the intensity moderate and stop a rep short.")
+        case .high: return String(localized: "You're recovered. Train as planned and chase your targets.")
+        case .peak: return String(localized: "Excellent recovery. A good day to push for a personal record.")
         }
     }
 }

@@ -137,10 +137,10 @@ enum MuscleRecoveryBand: Sendable {
 
     var label: String {
         switch self {
-        case .recovering: return "Recovering"
-        case .building:   return "Building"
-        case .ready:      return "Ready"
-        case .fresh:      return "Fresh"
+        case .recovering: return String(localized: "Recovering")
+        case .building:   return String(localized: "Building")
+        case .ready:      return String(localized: "Ready")
+        case .fresh:      return String(localized: "Fresh")
         }
     }
 }

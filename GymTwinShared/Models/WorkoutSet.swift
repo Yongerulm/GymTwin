@@ -9,16 +9,16 @@ enum WorkoutSetType: String, Codable, CaseIterable, Sendable {
     /// Full display name.
     var label: String {
         switch self {
-        case .warmup: return "Warm-up"
-        case .working: return "Working"
-        case .dropset: return "Drop Set"
-        case .amrap: return "AMRAP"
-        case .superset: return "Superset"
-        case .emom: return "EMOM"
-        case .tabata: return "Tabata"
-        case .circuit: return "Circuit"
-        case .timed: return "Timed"
-        case .cluster: return "Cluster"
+        case .warmup: return String(localized: "Warm-up")
+        case .working: return String(localized: "Working")
+        case .dropset: return String(localized: "Drop Set")
+        case .amrap: return String(localized: "AMRAP")
+        case .superset: return String(localized: "Superset")
+        case .emom: return String(localized: "EMOM")
+        case .tabata: return String(localized: "Tabata")
+        case .circuit: return String(localized: "Circuit")
+        case .timed: return String(localized: "Timed")
+        case .cluster: return String(localized: "Cluster")
         }
     }
 

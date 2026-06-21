@@ -424,3 +424,23 @@
 "Restart required" = "Neustart erforderlich";
 "Quit and reopen Gym Twin to fully apply the language." = "Beende Gym Twin und öffne es neu, um die Sprache vollständig zu übernehmen.";
 "Build your first plan in Train" = "Erstelle deinen ersten Plan unter „Training“";
+
+// MARK: - Readiness / Recovery / Set types (Service-Strings)
+"Take it easy" = "Ruhig angehen";
+"Moderate" = "Moderat";
+"Ready" = "Bereit";
+"Peak" = "Topform";
+"Recovery is low. Prioritise rest, mobility or a light session today." = "Erholung niedrig. Priorisiere heute Ruhe, Mobilität oder eine lockere Einheit.";
+"You're partly recovered. Keep the intensity moderate and stop a rep short." = "Teilweise erholt. Halte die Intensität moderat und höre eine Wiederholung früher auf.";
+"You're recovered. Train as planned and chase your targets." = "Du bist erholt. Trainiere wie geplant und gib Vollgas.";
+"Excellent recovery. A good day to push for a personal record." = "Hervorragende Erholung. Ein guter Tag für einen persönlichen Rekord.";
+"Recovering" = "In Erholung";
+"Building" = "Im Aufbau";
+"Fresh" = "Frisch";
+"Warm-up" = "Aufwärmen";
+"Working" = "Arbeitssatz";
+"Drop Set" = "Dropsatz";
+"Superset" = "Supersatz";
+"Circuit" = "Zirkel";
+"Timed" = "Auf Zeit";
+"Cluster" = "Cluster";
