@@ -40,8 +40,8 @@ struct ExerciseDetailView: View {
             VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
                 Text(exercise.localizedName)
                     .font(.title2.weight(.bold))
-                if !exercise.muscleSummary.isEmpty {
-                    Text(exercise.muscleSummary)
+                if !exercise.primaryMuscles.isEmpty {
+                    Text(exercise.primaryMuscles.map { LocalizedNames.muscle($0) }.joined(separator: ", "))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -54,10 +54,10 @@ struct ExerciseDetailView: View {
 
     private var tags: some View {
         let items: [(String, String)] = [
-            exercise.equipment.map { ("dumbbell.fill", $0.capitalized) },
-            exercise.mechanic.map { ("arrow.triangle.branch", $0.capitalized) },
-            ("chart.bar.fill", exercise.level.capitalized),
-            exercise.force.map { ("arrow.up.forward", $0.capitalized) },
+            exercise.equipment.map { ("dumbbell.fill", LocalizedNames.term($0)) },
+            exercise.mechanic.map { ("arrow.triangle.branch", LocalizedNames.term($0)) },
+            ("chart.bar.fill", LocalizedNames.term(exercise.level)),
+            exercise.force.map { ("arrow.up.forward", LocalizedNames.term($0)) },
         ].compactMap { $0 }
 
         return FlowRow(spacing: DS.Spacing.sm) {
@@ -95,7 +95,7 @@ struct ExerciseDetailView: View {
                 .foregroundStyle(.tertiary)
             FlowRow(spacing: DS.Spacing.sm) {
                 ForEach(muscles, id: \.self) { muscle in
-                    Text(muscle.capitalized)
+                    Text(LocalizedNames.muscle(muscle))
                         .font(.subheadline.weight(.medium))
                         .padding(.horizontal, DS.Spacing.md)
                         .padding(.vertical, DS.Spacing.xs)

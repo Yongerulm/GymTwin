@@ -464,7 +464,7 @@ private struct AreaCard: View {
                     HStack(spacing: DS.Spacing.xs) {
                         Image(systemName: muscleSymbol)
                             .font(.subheadline.weight(.bold))
-                        Text(area.name)
+                        Text(LocalizedNames.muscle(area.name))
                             .font(.title3.weight(.bold))
                     }
                     .foregroundStyle(.white)

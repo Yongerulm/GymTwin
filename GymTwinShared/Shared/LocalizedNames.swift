@@ -32,6 +32,20 @@ enum LocalizedNames {
         return muscleDE[english.lowercased()] ?? english
     }
 
+    /// Localized machine-setting label (e.g. "Seat Height" → "Sitzhöhe").
+    static func setting(_ english: String) -> String {
+        guard isGerman else { return english }
+        return settingDE[english.lowercased()] ?? english
+    }
+
+    /// Localized exercise metadata (equipment / category / level / mechanic /
+    /// force / muscle), all from one small vocabulary.
+    static func term(_ english: String) -> String {
+        guard isGerman, !english.isEmpty else { return english }
+        let key = english.lowercased()
+        return termDE[key] ?? muscleDE[key] ?? english
+    }
+
     // MARK: - Bundled exercise dictionary (generated, en → de)
 
     private static let exerciseDE: [String: String] = loadJSON("exercise_names_de")
@@ -62,6 +76,71 @@ enum LocalizedNames {
         "Assist Chin": "Klimmzug-Maschine (unterstützt)",
         "Hip Abductor": "Abduktoren-Maschine",
         "Hip Adductor": "Adduktoren-Maschine",
+        // SRC gym seed (SampleData) — the names actually shown in plans/sessions.
+        "Pec Deck": "Butterfly",
+        "Lat Pulldown": "Latzug",
+        "Seated Row": "Sitzrudern",
+        "Leg Press": "Beinpresse",
+        "Bicep Curl": "Bizeps-Curl",
+        "Triceps Pushdown": "Trizeps-Drücken",
+    ]
+
+    // MARK: - Machine settings (SampleData)
+
+    private static let settingDE: [String: String] = [
+        "seat height": "Sitzhöhe",
+        "back position": "Rückenposition",
+        "back angle": "Rückenlehne",
+        "handle position": "Griffposition",
+        "handle width": "Griffbreite",
+        "range": "Bewegungsbereich",
+        "knee pad": "Kniepolster",
+        "chest pad": "Brustpolster",
+        "seat position": "Sitzposition",
+        "seat depth": "Sitztiefe",
+        "ankle pad": "Fußpolster",
+        "arm pad": "Armpolster",
+        "cable height": "Kabelhöhe",
+        "weight": "Gewicht",
+        "level": "Stufe",
+        "incline": "Neigung",
+    ]
+
+    // MARK: - Exercise metadata (equipment / category / level / mechanic / force)
+
+    private static let termDE: [String: String] = [
+        // equipment
+        "body only": "Eigengewicht",
+        "barbell": "Langhantel",
+        "dumbbell": "Kurzhantel",
+        "kettlebells": "Kettlebells",
+        "cable": "Kabelzug",
+        "machine": "Maschine",
+        "bands": "Bänder",
+        "medicine ball": "Medizinball",
+        "exercise ball": "Gymnastikball",
+        "foam roll": "Faszienrolle",
+        "e-z curl bar": "SZ-Stange",
+        "other": "Sonstiges",
+        // category
+        "strength": "Kraft",
+        "stretching": "Dehnen",
+        "plyometrics": "Plyometrie",
+        "strongman": "Strongman",
+        "powerlifting": "Powerlifting",
+        "cardio": "Cardio",
+        "olympic weightlifting": "Olympisches Gewichtheben",
+        // level
+        "beginner": "Anfänger",
+        "intermediate": "Fortgeschritten",
+        "expert": "Experte",
+        // mechanic
+        "compound": "Mehrgelenkig",
+        "isolation": "Isolation",
+        // force
+        "push": "Drücken",
+        "pull": "Ziehen",
+        "static": "Statisch",
     ]
 
     // MARK: - Muscle groups / areas

@@ -110,7 +110,7 @@ struct MachineDetailView: View {
                             .font(.system(size: 52, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.90))
                         if !machine.category.isEmpty {
-                            Text(machine.category.uppercased())
+                            Text(LocalizedNames.muscle(machine.category).uppercased())
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(.white.opacity(0.65))
                                 .kerning(1.5)
@@ -135,13 +135,13 @@ struct MachineDetailView: View {
             HStack(spacing: DS.Spacing.sm) {
                 if let areaName = machine.area?.name {
                     TagPill(
-                        text: areaName,
+                        text: LocalizedNames.muscle(areaName),
                         systemImage: DS.Muscle.symbol(for: areaName),
                         tint: DS.Muscle.color(for: areaName)
                     )
                 }
                 if !machine.category.isEmpty {
-                    TagPill(text: machine.category, systemImage: "tag.fill")
+                    TagPill(text: LocalizedNames.muscle(machine.category), systemImage: "tag.fill")
                 }
             }
             if !machine.notes.isEmpty {
@@ -184,7 +184,7 @@ struct MachineDetailView: View {
             ) {
                 ForEach(settings) { setting in
                     MachineSettingChip(
-                        title: setting.title,
+                        title: LocalizedNames.setting(setting.title),
                         value: setting.value.isEmpty ? "—" : setting.value,
                         tint: chipTint(at: setting.sortIndex)
                     )
@@ -259,7 +259,7 @@ struct MachineDetailView: View {
         if let pr = personalRecord {
             let prText = formatSet(pr)
             SuggestedSetCard(
-                machineName: machine.name,
+                machineName: machine.localizedName,
                 weightText: formatWeight(pr.weight),
                 repsText: "\(pr.repetitions)",
                 note: "Personal record — \(prText)"
