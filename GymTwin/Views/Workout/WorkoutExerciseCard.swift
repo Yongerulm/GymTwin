@@ -21,6 +21,12 @@ struct ExerciseSessionCard: View {
     /// Focus mode: only the expanded exercise shows its full controls.
     var isExpanded: Bool = true
     var onToggle: (() -> Void)? = nil
+    /// Edit the planned weight/reps — saved to the session AND the plan template.
+    var onEditTarget: ((Double, Int) -> Void)? = nil
+
+    @State private var showTargetEdit = false
+    @State private var editWeight: Double = 0
+    @State private var editReps: Int = 0
 
     /// 0…1 completion against the plan target (for the collapsed progress bar).
     private var planProgress: Double {
@@ -133,7 +139,37 @@ struct ExerciseSessionCard: View {
                         targetStat("Set", "\(min(exercise.sets.count + (exercise.isPlanComplete ? 0 : 1), tSets))/\(tSets)")
                         targetStat("Target", "\(tReps) reps")
                         targetStat("Weight", "\(fmtWeight(tWeight)) kg")
+                        Spacer(minLength: 0)
+                        if onEditTarget != nil {
+                            Button {
+                                editWeight = tWeight; editReps = tReps
+                                withAnimation(DS.Motion.snappy) { showTargetEdit.toggle() }
+                            } label: {
+                                Image(systemName: showTargetEdit ? "checkmark" : "slider.horizontal.3")
+                                    .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(DS.Palette.accent)
+                                    .frame(width: 40, height: 40)
+                                    .background(DS.Palette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(showTargetEdit ? "Done editing target" : "Edit planned weight and reps")
+                        }
                     }
+
+                    // Editable target — persists to the plan for next time.
+                    if showTargetEdit, let onEditTarget {
+                        HStack(spacing: DS.Spacing.md) {
+                            inlineStepper(label: "kg", value: fmtWeight(editWeight),
+                                          dec: { editWeight = max(0, editWeight - 2.5); onEditTarget(editWeight, editReps) },
+                                          inc: { editWeight += 2.5; onEditTarget(editWeight, editReps) })
+                            inlineStepper(label: "reps", value: "\(editReps)",
+                                          dec: { editReps = max(1, editReps - 1); onEditTarget(editWeight, editReps) },
+                                          inc: { editReps += 1; onEditTarget(editWeight, editReps) })
+                        }
+                        Label("Saved to your plan for next time", systemImage: "checkmark.circle")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+
                     if let onCompleteSet, !exercise.isPlanComplete {
                         Button(action: onCompleteSet) {
                             Label("Complete Set", systemImage: "checkmark.circle.fill")

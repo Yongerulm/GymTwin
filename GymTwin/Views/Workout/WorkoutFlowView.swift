@@ -466,7 +466,11 @@ struct WorkoutFlowView: View {
                             withAnimation(DS.Motion.spring) {
                                 expandedID = (effectiveExpandedID == exercise.id) ? UUID() : exercise.id
                             }
-                        }
+                        },
+                        onEditTarget: exercise.targetWeight != nil ? { weight, reps in
+                            model.updateTarget(weight: weight, reps: reps, forExerciseAt: index)
+                            persistPlanTarget(planExerciseID: exercise.planExerciseID, weight: weight, reps: reps)
+                        } : nil
                     )
                 }
 
@@ -606,6 +610,20 @@ struct WorkoutFlowView: View {
         let coach = CoachService(context: modelContext)
         guard !coach.history(forMachineID: id).isEmpty else { return nil }
         return coach.progression(forMachineID: id, goal: .muscleGain).message
+    }
+
+    /// Persist an edited target back to the plan template, so the new weight/
+    /// reps become the default next time (a deliberate, user-initiated change).
+    private func persistPlanTarget(planExerciseID: UUID?, weight: Double, reps: Int) {
+        guard let pid = planExerciseID else { return }
+        for plan in plans {
+            if let pe = plan.exercises.first(where: { $0.id == pid }) {
+                pe.targetWeight = weight
+                pe.targetReps = max(1, reps)
+                try? modelContext.save()
+                return
+            }
+        }
     }
 
     /// Log a set at the exercise's predefined target and start the rest timer.

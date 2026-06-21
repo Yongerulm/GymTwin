@@ -288,6 +288,14 @@ final class WorkoutViewModel {
         syncLiveActivity()
     }
 
+    /// Update the planned weight/reps for an exercise in the live session.
+    func updateTarget(weight: Double, reps: Int, forExerciseAt index: Int) {
+        guard exercises.indices.contains(index) else { return }
+        exercises[index].targetWeight = weight
+        exercises[index].targetReps = max(1, reps)
+        persistDraft()
+    }
+
     /// Scale every planned exercise's target set count by `delta` (clamped to
     /// at least 1) — used to adapt the session to today's readiness.
     func adjustAllTargetSets(by delta: Int) {
