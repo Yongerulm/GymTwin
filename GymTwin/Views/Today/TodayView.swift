@@ -7,6 +7,9 @@ struct TodayView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
+    @Environment(GymSelection.self) private var gymSelection
+    @Query(sort: \WorkoutPlan.sortIndex) private var plans: [WorkoutPlan]
+    @Query private var gyms: [Gym]
 
     @State private var model = TodayViewModel()
     @State private var showingScanFlow = false
@@ -18,9 +21,8 @@ struct TodayView: View {
             ScrollView {
                 LazyVStack(spacing: DS.Spacing.xl) {
                     heroSection
-                    scanMachineButton
+                    trainNowSection
                     nextMachineSection
-                    quickActionsSection
                     healthSection
                     recentMachinesSection
                 }
@@ -30,6 +32,7 @@ struct TodayView: View {
             .navigationTitle("Today")
             .navigationBarTitleDisplayMode(.large)
             .background(GymBackground().ignoresSafeArea())
+            .toolbar { gymChip }
         }
         .task {
             model.bind(modelContext)
@@ -73,6 +76,94 @@ struct TodayView: View {
             return "\(model.statistics.currentStreakDays)-day streak · Keep it going"
         }
         return "Ready for today's workout"
+    }
+
+    // MARK: - Gym context chip (which gym am I at)
+
+    @ToolbarContentBuilder
+    private var gymChip: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            if !gyms.isEmpty {
+                let active = gymSelection.activeGym(from: gyms)
+                Menu {
+                    ForEach(gyms) { gym in
+                        Button {
+                            gymSelection.activeGymID = gym.id
+                        } label: {
+                            Label(gym.name, systemImage: active?.id == gym.id ? "checkmark" : "")
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.and.ellipse").font(.caption2)
+                        Text(active?.name ?? "Gym").font(.subheadline.weight(.semibold))
+                        if gyms.count > 1 { Image(systemName: "chevron.down").font(.caption2) }
+                    }
+                    .foregroundStyle(DS.Palette.accent)
+                }
+                .accessibilityLabel("Current gym: \(active?.name ?? "none"). Tap to switch.")
+            }
+        }
+    }
+
+    // MARK: - Train now — one-tap plan launchpad
+
+    @ViewBuilder
+    private var trainNowSection: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            PremiumSectionHeader("Start training", subtitle: "Tap a plan — your weights load instantly")
+
+            ForEach(plans) { plan in
+                Button {
+                    router.startWorkout(planID: plan.id.uuidString)
+                } label: {
+                    planStartCard(name: plan.name, count: plan.exercises.count)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Start \(plan.name), \(plan.exercises.count) machines")
+            }
+
+            // Free / scan-first session.
+            Button { router.startScan() } label: {
+                HStack(spacing: DS.Spacing.md) {
+                    Image(systemName: "bolt.fill")
+                        .font(.headline).foregroundStyle(DS.Palette.accent)
+                        .frame(width: 38, height: 38)
+                        .background(DS.Palette.accent.opacity(0.14), in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Free session").font(.subheadline.weight(.bold))
+                        Text("No plan — scan or add machines as you go").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                }
+                .padding(DS.Spacing.lg)
+                .background(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).fill(DS.Palette.surface))
+                .overlay(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).strokeBorder(.white.opacity(0.06), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Start a free session")
+        }
+    }
+
+    private func planStartCard(name: String, count: Int) -> some View {
+        HStack(spacing: DS.Spacing.md) {
+            Image(systemName: "play.fill")
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(width: 38, height: 38)
+                .background(DS.Palette.accentGradient, in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+                .shadow(color: DS.Palette.accent.opacity(0.35), radius: 8, x: 0, y: 4)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name).font(.headline.weight(.bold))
+                Text("\(count) machine\(count == 1 ? "" : "s")").font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+        }
+        .padding(DS.Spacing.lg)
+        .background(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).fill(DS.Palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).strokeBorder(DS.Palette.accent.opacity(0.18), lineWidth: 1))
     }
 
     // MARK: - Scan Machine button
