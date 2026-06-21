@@ -58,6 +58,8 @@ struct WorkoutFlowView: View {
     /// Today's readiness (HRV + sleep led), loaded once when the session starts.
     @State private var readiness: Int?
     @State private var readinessDismissed = false
+    /// Focus mode: the explicitly expanded exercise (nil → follow the active one).
+    @State private var expandedID: UUID?
 
     var body: some View {
         NavigationStack {
@@ -458,6 +460,12 @@ struct WorkoutFlowView: View {
                         },
                         onRemoveExercise: {
                             pendingRemoveID = exercise.id
+                        },
+                        isExpanded: effectiveExpandedID == exercise.id,
+                        onToggle: {
+                            withAnimation(DS.Motion.spring) {
+                                expandedID = (effectiveExpandedID == exercise.id) ? UUID() : exercise.id
+                            }
                         }
                     )
                 }
@@ -562,6 +570,16 @@ struct WorkoutFlowView: View {
         model.exercises.firstIndex { $0.targetSets != nil && !$0.isPlanComplete }
     }
 
+    /// Focus mode: the exercise that should be expanded. Follows the active
+    /// (first incomplete) exercise unless the user expanded another explicitly.
+    private var effectiveExpandedID: UUID? {
+        if let expandedID { return expandedID }
+        if let idx = activeExerciseIndex, model.exercises.indices.contains(idx) {
+            return model.exercises[idx].id
+        }
+        return model.exercises.first?.id
+    }
+
     /// Slim header showing the plan name and how many exercises are done.
     private func planProgressHeader(_ plan: WorkoutPlan) -> some View {
         let total = model.exercises.count
@@ -597,6 +615,11 @@ struct WorkoutFlowView: View {
               let reps = model.exercises[index].targetReps else { return }
         model.addSet(weight: weight, reps: reps, type: .working, toExerciseAt: index)
         startRest()
+        // Auto-advance focus: once the exercise hits its target, follow the
+        // next active (incomplete) exercise.
+        if model.exercises[index].isPlanComplete {
+            withAnimation(DS.Motion.spring) { expandedID = nil }
+        }
     }
 
     // MARK: - Add machine button
@@ -937,6 +960,9 @@ struct WorkoutFlowView: View {
 
         model.addExercise(machine: machine)
         guard let index = model.exercises.firstIndex(where: { $0.machineID == machine.id }) else { return }
+
+        // Focus mode: scanning a machine expands exactly that exercise.
+        withAnimation(DS.Motion.spring) { expandedID = model.exercises[index].id }
 
         // Prefer the active plan's predefined target for this machine; otherwise
         // the coach's suggestion (last session / rule).

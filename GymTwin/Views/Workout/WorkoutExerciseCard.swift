@@ -18,6 +18,15 @@ struct ExerciseSessionCard: View {
     let onRepeatSet: () -> Void
     let onRemoveSet: (UUID) -> Void
     let onRemoveExercise: () -> Void
+    /// Focus mode: only the expanded exercise shows its full controls.
+    var isExpanded: Bool = true
+    var onToggle: (() -> Void)? = nil
+
+    /// 0…1 completion against the plan target (for the collapsed progress bar).
+    private var planProgress: Double {
+        guard let t = exercise.targetSets, t > 0 else { return exercise.sets.isEmpty ? 0 : 1 }
+        return min(Double(exercise.sets.count) / Double(t), 1)
+    }
 
     // Inline quick-add editor state.
     @State private var showInline = false
@@ -72,15 +81,38 @@ struct ExerciseSessionCard: View {
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(DS.Palette.success)
                     }
-                    Button(role: .destructive, action: onRemoveExercise) {
-                        Image(systemName: "trash")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: 36, height: 36)
+                    if onToggle != nil {
+                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.tertiary)
+                            .frame(width: 26, height: 36)
                     }
-                    .accessibilityLabel("Remove \(exercise.machineName) from session")
+                    if isExpanded {
+                        Button(role: .destructive, action: onRemoveExercise) {
+                            Image(systemName: "trash")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .frame(width: 36, height: 36)
+                        }
+                        .accessibilityLabel("Remove \(exercise.machineName) from session")
+                    }
+                }
+                .contentShape(Rectangle())
+                .onTapGesture { onToggle?() }
+
+                // Collapsed: a thin progress bar is the only extra detail.
+                if !isExpanded, exercise.targetSets != nil {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.white.opacity(0.08))
+                            Capsule().fill(exercise.isPlanComplete ? DS.Palette.success : DS.Palette.accent)
+                                .frame(width: geo.size.width * planProgress)
+                        }
+                    }
+                    .frame(height: 5)
                 }
 
+                if isExpanded {
                 // In-set coaching nudge (active exercise only).
                 if let coachHint {
                     HStack(spacing: DS.Spacing.xs) {
@@ -198,6 +230,7 @@ struct ExerciseSessionCard: View {
                         }
                     }
                 }
+                } // if isExpanded
             }
         }
         .overlay(
