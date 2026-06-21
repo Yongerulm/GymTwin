@@ -26,7 +26,6 @@ struct TodayView: View {
                     }
                     heroSection
                     trainNowSection
-                    nextMachineSection
                     healthSection
                     recentMachinesSection
                 }
@@ -148,6 +147,23 @@ struct TodayView: View {
     private var trainNowSection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
             PremiumSectionHeader("Start training", subtitle: "Tap a plan — your weights load instantly")
+
+            if plans.isEmpty {
+                Button { router.openGym() } label: {
+                    HStack(spacing: DS.Spacing.sm) {
+                        Image(systemName: "plus.circle.fill").foregroundStyle(DS.Palette.accent)
+                        Text("Build your first plan in Train")
+                            .font(.subheadline.weight(.semibold)).foregroundStyle(DS.Palette.accent)
+                        Spacer()
+                        Image(systemName: "chevron.right").font(.caption.weight(.semibold)).foregroundStyle(.tertiary)
+                    }
+                    .padding(DS.Spacing.lg)
+                    .background(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).fill(DS.Palette.surface))
+                    .overlay(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).strokeBorder(DS.Palette.accent.opacity(0.25), style: StrokeStyle(lineWidth: 1.5, dash: [6])))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Build your first plan")
+            }
 
             ForEach(plans) { plan in
                 Button {
