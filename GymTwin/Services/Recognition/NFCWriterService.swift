@@ -1,6 +1,9 @@
 import Foundation
 #if canImport(CoreNFC)
-import CoreNFC
+// CoreNFC's tag/payload types aren't Sendable and its completion handlers are
+// @Sendable; @preconcurrency keeps these (safe, NFC-queue-serialised) captures
+// as the intended behaviour without Swift 6 concurrency noise.
+@preconcurrency import CoreNFC
 
 /// Writes a URL NDEF record (`gymtwin://machine/<code>`) to a machine's NFC tag,
 /// so that later just tapping the tag launches the app via the small system
@@ -55,19 +58,29 @@ extension NFCWriterService: NFCNDEFReaderSessionDelegate {
             finish(false, message: "Could not prepare the tag.")
             return
         }
+        // CoreNFC's tag/payload aren't Sendable but its completion handlers are
+        // @Sendable; box them so the (NFC-queue-serialised) captures are safe.
+        let box = NFCWriteBox(tag: tag, payload: payload)
         session.connect(to: tag) { [self] error in
             if error != nil { finish(false, message: "Connection failed — try again."); return }
-            tag.queryNDEFStatus { [self] status, _, _ in
+            box.tag.queryNDEFStatus { [self] status, _, _ in
                 guard status == .readWrite else {
                     finish(false, message: status == .readOnly ? "This tag is read-only." : "This tag can't be written.")
                     return
                 }
-                tag.writeNDEF(NFCNDEFMessage(records: [payload])) { [self] writeError in
+                box.tag.writeNDEF(NFCNDEFMessage(records: [box.payload])) { [self] writeError in
                     finish(writeError == nil, message: writeError == nil ? "Saved to tag ✓" : "Write failed — try again.")
                 }
             }
         }
     }
+}
+
+/// Carries non-Sendable CoreNFC values across the @Sendable completion handlers.
+/// Safe because all access is serialised on the NFC reader queue.
+private struct NFCWriteBox: @unchecked Sendable {
+    let tag: any NFCNDEFTag
+    let payload: NFCNDEFPayload
 }
 #else
 /// Stub for platforms without CoreNFC (e.g. the Simulator builds where it links
