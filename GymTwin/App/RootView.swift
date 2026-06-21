@@ -36,7 +36,8 @@ struct RootView: View {
                 initialMachineID: router.workoutMachineID,
                 scanMode: router.workoutScanMode,
                 planID: router.workoutPlanID,
-                scanCode: router.workoutScanCode
+                scanCode: router.workoutScanCode,
+                resume: router.workoutResume
             )
             .environment(router)
             .environment(gymSelection)

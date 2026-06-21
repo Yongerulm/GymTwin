@@ -11,6 +11,8 @@ struct WorkoutFlowView: View {
     var planID: String? = nil
     /// Machine code from a background NFC tag — loads that machine on launch.
     var scanCode: String? = nil
+    /// Restore the persisted in-progress session instead of starting fresh.
+    var resume: Bool = false
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
@@ -83,7 +85,10 @@ struct WorkoutFlowView: View {
         }
         .task {
             model.bind(modelContext)
-            if let code = scanCode {
+            if resume, model.restoreDraft() {
+                // Resuming an interrupted session — restore the saved draft.
+                programChosen = true
+            } else if let code = scanCode {
                 // Launched from a background NFC tag — load that machine directly.
                 if !model.isActive { model.start() }
                 activePlanID = ""

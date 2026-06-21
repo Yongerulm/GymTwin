@@ -33,6 +33,18 @@ final class AppRouter {
     var workoutPlanID: String?
     /// Machine code from a background NFC tag deep link (gymtwin://machine/<code>).
     var workoutScanCode: String?
+    /// When true, the flow restores the persisted in-progress session.
+    var workoutResume = false
+
+    /// Resume a session that was interrupted (app closed mid-workout).
+    func resumeWorkout() {
+        workoutMachineID = nil
+        workoutScanMode = false
+        workoutPlanID = nil
+        workoutScanCode = nil
+        workoutResume = true
+        isWorkoutActive = true
+    }
 
     /// Start a session from a tapped NFC tag (no system scan sheet): loads the
     /// machine for the given code into a fresh session.
@@ -75,6 +87,7 @@ final class AppRouter {
         workoutScanMode = false
         workoutPlanID = nil
         workoutScanCode = nil
+        workoutResume = false
     }
 
     /// Jump to the Workouts hub (which hosts the gym digital twin).

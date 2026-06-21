@@ -101,6 +101,54 @@ final class WorkoutViewModel {
         startTimer()
         WorkoutLiveActivityController.start(gymName: "Gym Twin", startedAt: startDate)
         WidgetSyncService.setWorkoutActive(true)
+        persistDraft()
+    }
+
+    /// Restore an in-progress session persisted before the app was closed.
+    /// Returns false when there's nothing to resume.
+    @discardableResult
+    func restoreDraft() -> Bool {
+        guard let draft = WorkoutDraftStore.load() else { return false }
+        stopTimer()
+        startDate = draft.startDate
+        exercises = draft.exercises.map { e in
+            DraftExercise(
+                machineID: e.machineID,
+                machineName: e.machineName,
+                sets: e.sets.map { DraftSet(weight: $0.weight, reps: $0.reps, type: WorkoutSetType(rawValue: $0.typeRaw) ?? .working) },
+                planExerciseID: e.planExerciseID,
+                targetSets: e.targetSets,
+                targetReps: e.targetReps,
+                targetWeight: e.targetWeight
+            )
+        }
+        isActive = true
+        elapsedSeconds = max(0, Int(Date().timeIntervalSince(startDate)))
+        startTimer()
+        WorkoutLiveActivityController.start(gymName: "Gym Twin", startedAt: startDate)
+        WidgetSyncService.setWorkoutActive(true)
+        persistDraft()
+        return true
+    }
+
+    /// Snapshot the live session so it can be resumed after the app is closed.
+    private func persistDraft() {
+        guard isActive else { return }
+        let draft = WorkoutDraft(
+            startDate: startDate,
+            exercises: exercises.map { ex in
+                WorkoutDraft.Exercise(
+                    machineID: ex.machineID,
+                    machineName: ex.machineName,
+                    planExerciseID: ex.planExerciseID,
+                    targetSets: ex.targetSets,
+                    targetReps: ex.targetReps,
+                    targetWeight: ex.targetWeight,
+                    sets: ex.sets.map { WorkoutDraft.LoggedSet(weight: $0.weight, reps: $0.reps, typeRaw: $0.type.rawValue) }
+                )
+            }
+        )
+        WorkoutDraftStore.save(draft)
     }
 
     /// Persist the draft session as a `Workout`, save to HealthKit, then reset.
@@ -175,6 +223,7 @@ final class WorkoutViewModel {
         exercises = []
         elapsedSeconds = 0
         startDate = Date()
+        WorkoutDraftStore.clear()
         Task { await WorkoutLiveActivityController.end() }
         WidgetSyncService.setWorkoutActive(false)
     }
@@ -193,6 +242,7 @@ final class WorkoutViewModel {
                 planProgress: nil
             )
         }
+        persistDraft()
     }
 
     // MARK: - Exercise management
@@ -244,6 +294,7 @@ final class WorkoutViewModel {
         for i in exercises.indices where exercises[i].targetSets != nil {
             exercises[i].targetSets = max(1, (exercises[i].targetSets ?? 1) + delta)
         }
+        persistDraft()
     }
 
     func removeExercise(at offsets: IndexSet) {

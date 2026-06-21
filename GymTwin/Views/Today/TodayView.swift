@@ -13,6 +13,7 @@ struct TodayView: View {
 
     @State private var model = TodayViewModel()
     @State private var showingScanFlow = false
+    @State private var pendingDraft: WorkoutDraft?
 
     // MARK: - Body
 
@@ -20,6 +21,9 @@ struct TodayView: View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: DS.Spacing.xl) {
+                    if let draft = pendingDraft, !router.isWorkoutActive {
+                        resumeBar(draft)
+                    }
                     heroSection
                     trainNowSection
                     nextMachineSection
@@ -39,6 +43,7 @@ struct TodayView: View {
         }
         .onAppear {
             model.refresh()
+            pendingDraft = WorkoutDraftStore.load()
         }
         .fullScreenCover(isPresented: $showingScanFlow) {
             ScanFlowView()
@@ -104,6 +109,37 @@ struct TodayView: View {
                 .accessibilityLabel("Current gym: \(active?.name ?? "none"). Tap to switch.")
             }
         }
+    }
+
+    // MARK: - Resume in-progress session
+
+    private func resumeBar(_ draft: WorkoutDraft) -> some View {
+        HStack(spacing: DS.Spacing.md) {
+            Image(systemName: "figure.strengthtraining.traditional")
+                .font(.headline).foregroundStyle(.white)
+                .frame(width: 40, height: 40)
+                .background(DS.Palette.accentGradient, in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Resume workout").font(.subheadline.weight(.bold))
+                Text("\(draft.exercises.count) exercise\(draft.exercises.count == 1 ? "" : "s") · \(draft.totalSets) sets logged")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button { WorkoutDraftStore.clear(); pendingDraft = nil } label: {
+                Image(systemName: "xmark.circle.fill").font(.title3).foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Discard in-progress workout")
+        }
+        .padding(DS.Spacing.md)
+        .background(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).fill(DS.Palette.surface))
+        .overlay(RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous).strokeBorder(DS.Palette.accent.opacity(0.4), lineWidth: 1.5))
+        .shadow(color: DS.Palette.accent.opacity(0.18), radius: 10, x: 0, y: 4)
+        .contentShape(Rectangle())
+        .onTapGesture { router.resumeWorkout() }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel("Resume your in-progress workout — \(draft.exercises.count) exercises, \(draft.totalSets) sets logged")
     }
 
     // MARK: - Train now — one-tap plan launchpad
