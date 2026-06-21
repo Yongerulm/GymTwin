@@ -64,7 +64,7 @@ struct MachineDetailView: View {
             }
         }
         .background(GymBackground().ignoresSafeArea())
-        .navigationTitle(machine.name)
+        .navigationTitle(machine.localizedName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { toolbarItems }
         .sheet(isPresented: $showingEdit, onDismiss: { model.refresh() }) {
@@ -130,7 +130,7 @@ struct MachineDetailView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-            Text(machine.name)
+            Text(machine.localizedName)
                 .font(.title2.weight(.bold))
             HStack(spacing: DS.Spacing.sm) {
                 if let areaName = machine.area?.name {

@@ -12,6 +12,8 @@ final class Exercise {
     /// Stable slug identifier from the source catalog, e.g. "barbell-bench-press".
     @Attribute(.unique) var catalogID: String
     var name: String
+    /// Name shown to the user, translated when the app language is German.
+    var localizedName: String { LocalizedNames.exerciseName(name) }
 
     /// Muscle taxonomy (normalised vocabulary, e.g. "chest", "triceps").
     var primaryMuscles: [String]

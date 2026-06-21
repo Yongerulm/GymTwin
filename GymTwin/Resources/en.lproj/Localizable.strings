@@ -1,0 +1,448 @@
+/* ============================================================
+   GymTwin — English Localizable.strings (identity mapping)
+   Keys are the EXACT English literals that appear in source.
+   ============================================================ */
+
+// MARK: - Tab bar
+
+"Today" = "Today";
+"Train" = "Train";
+"Progress" = "Progress";
+"Profile" = "Profile";
+
+// MARK: - TodayView
+
+"Start training" = "Start training";
+"Tap a plan — your weights load instantly" = "Tap a plan — your weights load instantly";
+"Build your first plan in Train" = "Build your first plan in Train";
+"Free session" = "Free session";
+"No plan — scan or add machines as you go" = "No plan — scan or add machines as you go";
+"Scan Machine" = "Scan Machine";
+"QR · NFC · code — start in seconds" = "QR · NFC · code — start in seconds";
+"Resume workout" = "Resume workout";
+"Up Next" = "Up Next";
+"Based on your training history" = "Based on your training history";
+"No Workouts Yet" = "No Workouts Yet";
+"Start your first session and your training history will appear here." = "Start your first session and your training history will appear here.";
+"Start Workout" = "Start Workout";
+"Open Gym" = "Open Gym";
+"View Progress" = "View Progress";
+"Health" = "Health";
+"From Apple Health" = "From Apple Health";
+"Recent Machines" = "Recent Machines";
+"Tap to start a set" = "Tap to start a set";
+"All" = "All";
+"Quick Actions" = "Quick Actions";
+"Session Logged" = "Session Logged";
+"Ready for today's workout" = "Ready for today's workout";
+
+// MARK: - WorkoutsHubView
+
+"Workouts" = "Workouts";
+"Ready to train?" = "Ready to train?";
+"Start an empty session, then scan a machine to load your weights instantly." = "Start an empty session, then scan a machine to load your weights instantly.";
+"Start Workout" = "Start Workout";
+"Your Gym" = "Your Gym";
+"Browse areas and machines" = "Browse areas and machines";
+"Training Plans" = "Training Plans";
+"Build and pick your routine" = "Build and pick your routine";
+"Exercise Library" = "Exercise Library";
+"1000+ exercises to explore" = "1000+ exercises to explore";
+
+// MARK: - WorkoutFlowView
+
+"Start Workout" = "Start Workout";
+"Choose your program" = "Choose your program";
+"Follow a saved plan, or train freely and scan machines as you go." = "Follow a saved plan, or train freely and scan machines as you go.";
+"Free Training" = "Free Training";
+"No plan — scan or add machines as you go" = "No plan — scan or add machines as you go";
+"Build training plans in the Workouts tab to follow them here." = "Build training plans in the Workouts tab to follow them here.";
+"Scan a machine to begin" = "Scan a machine to begin";
+"Hold your iPhone to a machine's NFC tag — its preferred weights load automatically, ready to adjust." = "Hold your iPhone to a machine's NFC tag — its preferred weights load automatically, ready to adjust.";
+"Scan Machine" = "Scan Machine";
+"Add manually" = "Add manually";
+"Work through your program" = "Work through your program";
+"Today's readiness" = "Today's readiness";
+"Take it lighter — drop a set each" = "Take it lighter — drop a set each";
+"Feeling strong — add a set each" = "Feeling strong — add a set each";
+"Add Machine" = "Add Machine";
+"Rest Timer" = "Rest Timer";
+"REST" = "REST";
+"+15s" = "+15s";
+"Skip" = "Skip";
+"Discard" = "Discard";
+"Finish" = "Finish";
+"Machine detected" = "Machine detected";
+"Machine code" = "Machine code";
+"NFC needs a real device — enter a machine code to test the flow." = "NFC needs a real device — enter a machine code to test the flow.";
+"Load" = "Load";
+"Cancel" = "Cancel";
+"Finish Workout?" = "Finish Workout?";
+"Save & Finish" = "Save & Finish";
+"Discard Session" = "Discard Session";
+"Your session will be saved and synced to Health." = "Your session will be saved and synced to Health.";
+"Remove exercise?" = "Remove exercise?";
+"Remove" = "Remove";
+"Keep" = "Keep";
+"This removes the exercise and its logged sets from this session." = "This removes the exercise and its logged sets from this session.";
+"Plan complete — great work!" = "Plan complete — great work!";
+"Finish your workout, or add extra sets below." = "Finish your workout, or add extra sets below.";
+"Complete Set" = "Complete Set";
+
+// MARK: - WorkoutSetEntryView
+
+"Log Set" = "Log Set";
+"Weight" = "Weight";
+"Reps" = "Reps";
+"Log Set" = "Log Set";
+"Cancel" = "Cancel";
+
+// MARK: - ExerciseSessionCard / LoggedSetRow
+
+"Last session" = "Last session";
+"Add Set" = "Add Set";
+"Repeat" = "Repeat";
+"Log" = "Log";
+
+// MARK: - SessionSummaryView
+
+"Workout complete" = "Workout complete";
+"Done" = "Done";
+"Duration" = "Duration";
+"Volume" = "Volume";
+"Sets" = "Sets";
+"Exercises" = "Exercises";
+"New Personal Records" = "New Personal Records";
+"Today you beat your best" = "Today you beat your best";
+"Keep the momentum — train again tomorrow." = "Keep the momentum — train again tomorrow.";
+
+// MARK: - WorkoutMachinePicker
+
+"Add Machine" = "Add Machine";
+"Cancel" = "Cancel";
+"No machines" = "No machines";
+"Add machines to your gym catalog first." = "Add machines to your gym catalog first.";
+"Search machines or areas" = "Search machines or areas";
+
+// MARK: - GymView
+
+"Search machines" = "Search machines";
+"New Area" = "New Area";
+"Area name (e.g. Chest, Back)" = "Area name (e.g. Chest, Back)";
+"Add" = "Add";
+"Give this muscle group or zone a name." = "Give this muscle group or zone a name.";
+"New Gym" = "New Gym";
+"Gym name (e.g. SRC, Home Gym)" = "Gym name (e.g. SRC, Home Gym)";
+"Add another gym you train in. You can switch any time." = "Add another gym you train in. You can switch any time.";
+"Add Machine" = "Add Machine";
+"Add Area" = "Add Area";
+"Add Gym" = "Add Gym";
+"No Results" = "No Results";
+"Build Your Gym" = "Build Your Gym";
+"Add areas (Chest, Back, Legs…) and then populate them with machines." = "Add areas (Chest, Back, Legs…) and then populate them with machines.";
+"Add First Area" = "Add First Area";
+"No machines yet — tap to add one" = "No machines yet — tap to add one";
+"Uncategorized" = "Uncategorized";
+"Areas" = "Areas";
+"Machines" = "Machines";
+"Configured" = "Configured";
+
+// MARK: - MachineGridView
+
+"No Machines" = "No Machines";
+
+// MARK: - MachineDetailView
+
+"Preferred Settings" = "Preferred Settings";
+"Your saved adjustments" = "Your saved adjustments";
+"Last Session" = "Last Session";
+"History" = "History";
+"Suggested Next Set" = "Suggested Next Set";
+"Track Your Progress" = "Track Your Progress";
+"Start a workout on this machine to record sets and build your personal baseline." = "Start a workout on this machine to record sets and build your personal baseline.";
+"Start Workout" = "Start Workout";
+"Write NFC Tag" = "Write NFC Tag";
+"Hold near the tag…" = "Hold near the tag…";
+"Delete Machine" = "Delete Machine";
+"Delete" = "Delete";
+"Cancel" = "Cancel";
+"Edit" = "Edit";
+
+// MARK: - MachineEditView
+
+"New Machine" = "New Machine";
+"Edit Machine" = "Edit Machine";
+"Cancel" = "Cancel";
+"Save" = "Save";
+"Add Photo" = "Add Photo";
+"Details" = "Details";
+"Machine name" = "Machine name";
+"Category (e.g. Chest, Back, Legs)" = "Category (e.g. Chest, Back, Legs)";
+"Notes" = "Notes";
+"Gym Area" = "Gym Area";
+"Area" = "Area";
+"None" = "None";
+"New area name" = "New area name";
+"Add" = "Add";
+"Cancel New Area" = "Cancel New Area";
+"Add New Area" = "Add New Area";
+"Settings" = "Settings";
+"Store your personal machine adjustments: seat position, weight pin, handle height, etc." = "Store your personal machine adjustments: seat position, weight pin, handle height, etc.";
+"Add Setting" = "Add Setting";
+"Label" = "Label";
+"Value" = "Value";
+"Name is required" = "Name is required";
+
+// MARK: - PlansListView / PlanBuilderView
+
+"Training Plans" = "Training Plans";
+"No plans yet" = "No plans yet";
+"Build a plan from your machines — then just scan a machine to jump straight into it." = "Build a plan from your machines — then just scan a machine to jump straight into it.";
+"Create Plan" = "Create Plan";
+"Suggest a plan with AI" = "Suggest a plan with AI";
+"New Plan" = "New Plan";
+"Edit Plan" = "Edit Plan";
+"Cancel" = "Cancel";
+"Save" = "Save";
+"Plan name (e.g. Push Day)" = "Plan name (e.g. Push Day)";
+"Base on an existing plan" = "Base on an existing plan";
+"Replace with another plan" = "Replace with another plan";
+"Loads that plan's machines and targets so you can tweak them into a new plan." = "Loads that plan's machines and targets so you can tweak them into a new plan.";
+"Machines" = "Machines";
+"Add machines" = "Add machines";
+"Add Machines" = "Add Machines";
+"Done" = "Done";
+"All added" = "All added";
+"Every machine in this gym is already in the plan." = "Every machine in this gym is already in the plan.";
+"Apply to all plans?" = "Apply to all plans?";
+"Apply everywhere" = "Apply everywhere";
+"Only this plan" = "Only this plan";
+"Duplicate as new plan" = "Duplicate as new plan";
+"Delete Plan" = "Delete Plan";
+
+// MARK: - PlanGeneratorView
+
+"Training Plan" = "Training Plan";
+"Gym" = "Gym";
+"Goal" = "Goal";
+"Days per week" = "Days per week";
+"Generating…" = "Generating…";
+"Generate Plan" = "Generate Plan";
+"No Plan Yet" = "No Plan Yet";
+"Choose your goal and weekly frequency above, then tap Generate Plan to get a personalised training schedule." = "Choose your goal and weekly frequency above, then tap Generate Plan to get a personalised training schedule.";
+"Your Schedule" = "Your Schedule";
+"Why this split?" = "Why this split?";
+"Target reps" = "Target reps";
+"Split" = "Split";
+"Rest or light cardio" = "Rest or light cardio";
+"Select gym" = "Select gym";
+
+// MARK: - ProgressDashboardView
+
+"Total Workouts" = "Total Workouts";
+"Total Volume" = "Total Volume";
+"Weekly Goal" = "Weekly Goal";
+"Streak" = "Streak";
+"Recovery" = "Recovery";
+"Readiness & muscle status" = "Readiness & muscle status";
+"AI Coach" = "AI Coach";
+"On-device guidance" = "On-device guidance";
+"Steps" = "Steps";
+"Sleep" = "Sleep";
+"Resting HR" = "Resting HR";
+"VO₂ Max" = "VO₂ Max";
+"Weekly Volume" = "Weekly Volume";
+"Last 8 weeks" = "Last 8 weeks";
+"No volume data yet" = "No volume data yet";
+"Muscle Balance" = "Muscle Balance";
+"Volume by group" = "Volume by group";
+"Personal Records" = "Personal Records";
+"Best set per machine" = "Best set per machine";
+"Insights" = "Insights";
+"Keep It Up" = "Keep It Up";
+"Recent Sessions" = "Recent Sessions";
+"Last 20 workouts" = "Last 20 workouts";
+"No Data Yet" = "No Data Yet";
+"Log your first workout to see analytics, personal records, and progress charts here." = "Log your first workout to see analytics, personal records, and progress charts here.";
+"HRV" = "HRV";
+
+// MARK: - ProfileView
+
+"Your Focus" = "Your Focus";
+"Goal" = "Goal";
+"Target reps" = "Target reps";
+"Sets" = "Sets";
+"BMI" = "BMI";
+"Personal" = "Personal";
+"Name" = "Name";
+"Your name" = "Your name";
+"Training Goal" = "Training Goal";
+"Body Stats" = "Body Stats";
+"Weight" = "Weight";
+"Height" = "Height";
+"Add your body stats to unlock BMI tracking in the summary above." = "Add your body stats to unlock BMI tracking in the summary above.";
+
+// MARK: - SettingsView
+
+"Settings" = "Settings";
+"Gym Twin" = "Gym Twin";
+"Your personal gym companion" = "Your personal gym companion";
+"Apple Health" = "Apple Health";
+"Connect Apple Health" = "Connect Apple Health";
+"Share workouts, body weight, and heart rate." = "Share workouts, body weight, and heart rate.";
+"Requesting…" = "Requesting…";
+"Authorize" = "Authorize";
+"Heart Rate" = "Heart Rate";
+"Body Weight" = "Body Weight";
+"Body Fat" = "Body Fat";
+"Active Energy" = "Active Energy";
+"Auto" = "Auto";
+"Saved per workout" = "Saved per workout";
+"Refresh Metrics" = "Refresh Metrics";
+"Workouts are saved to Apple Health automatically after authorization." = "Workouts are saved to Apple Health automatically after authorization.";
+"Apple Watch" = "Apple Watch";
+"Data" = "Data";
+"Export Workouts" = "Export Workouts";
+"Save all workout data as JSON" = "Save all workout data as JSON";
+"Smart Recommendations" = "Smart Recommendations";
+"Personalised set suggestions based on your history." = "Personalised set suggestions based on your history.";
+"Recommendations will appear during your workouts once enough training history is available." = "Recommendations will appear during your workouts once enough training history is available.";
+"Tools" = "Tools";
+"Build plans from your machines" = "Build plans from your machines";
+"Goals, body metrics & training age" = "Goals, body metrics & training age";
+"Admin" = "Admin";
+"Machine catalog, sync & AI rules" = "Machine catalog, sync & AI rules";
+"About" = "About";
+"Version" = "Version";
+"Offline-First" = "Offline-First";
+"All your data lives on-device. No account or cloud sync required." = "All your data lives on-device. No account or cloud sync required.";
+"Changes are saved automatically when you dismiss the keyboard." = "Changes are saved automatically when you dismiss the keyboard.";
+"Gym name" = "Gym name";
+"City, address…" = "City, address…";
+"Location" = "Location";
+
+// MARK: - AdminPanelView
+
+"Machine Library" = "Machine Library";
+"QR / NFC Mapping" = "QR / NFC Mapping";
+"How machine codes are encoded" = "How machine codes are encoded";
+"QR URL Format" = "QR URL Format";
+"NFC NDEF Format" = "NFC NDEF Format";
+"Example URLs" = "Example URLs";
+"Sync" = "Sync";
+"Push catalog to OpenSearch" = "Push catalog to OpenSearch";
+"Syncing…" = "Syncing…";
+"Sync to OpenSearch" = "Sync to OpenSearch";
+"Set OPENSEARCH_URL in the environment to enable remote sync. The app works fully offline without it." = "Set OPENSEARCH_URL in the environment to enable remote sync. The app works fully offline without it.";
+"AI Rules" = "AI Rules";
+"Deterministic coach logic (read-only)" = "Deterministic coach logic (read-only)";
+"Progressive Overload" = "Progressive Overload";
+"Deload Trigger" = "Deload Trigger";
+"Weight Rounding" = "Weight Rounding";
+"Progression Action" = "Progression Action";
+"No Definitions" = "No Definitions";
+"Tap + Add to create the first machine definition." = "Tap + Add to create the first machine definition.";
+"Add Machine" = "Add Machine";
+"Loading catalog…" = "Loading catalog…";
+"Lock" = "Lock";
+"Set Admin Passcode" = "Set Admin Passcode";
+"Admin Access" = "Admin Access";
+"Choose a 4-digit code to protect admin settings." = "Choose a 4-digit code to protect admin settings.";
+"Enter your 4-digit admin code to continue." = "Enter your 4-digit admin code to continue.";
+"Tap here to enter code" = "Tap here to enter code";
+"Identity" = "Identity";
+"Muscles" = "Muscles";
+"Comma-separated values" = "Comma-separated values";
+"Details" = "Details";
+"Machine Code" = "Machine Code";
+"Manufacturer" = "Manufacturer";
+"Category" = "Category";
+"Primary Muscles" = "Primary Muscles";
+"Secondary Muscles" = "Secondary Muscles";
+"Movement Pattern" = "Movement Pattern";
+"Difficulty" = "Difficulty";
+"Equipment Type" = "Equipment Type";
+"Edit Definition" = "Edit Definition";
+"Add Machine" = "Add Machine";
+"Cancel" = "Cancel";
+"Save" = "Save";
+
+// MARK: - OnboardingView
+
+"Welcome to Gym Twin" = "Welcome to Gym Twin";
+"Your gym's digital twin. Build a plan once, then just train — your weights and targets are always one tap away." = "Your gym's digital twin. Build a plan once, then just train — your weights and targets are always one tap away.";
+"Tap to load a machine" = "Tap to load a machine";
+"Hold your iPhone to a machine's NFC tag (or scan its code) and your predefined set loads instantly, ready to log." = "Hold your iPhone to a machine's NFC tag (or scan its code) and your predefined set loads instantly, ready to log.";
+"Follow your plan" = "Follow your plan";
+"Pick a plan, work through each machine, and Complete Set logs at your target and starts your rest. Progress tracks itself." = "Pick a plan, work through each machine, and Complete Set logs at your target and starts your rest. Progress tracks itself.";
+"Next" = "Next";
+"Get Started" = "Get Started";
+"Skip" = "Skip";
+
+// MARK: - ScanFlowView
+
+"Scan Machine" = "Scan Machine";
+"Point at the QR code on the equipment, tap NFC, or enter the code manually." = "Point at the QR code on the equipment, tap NFC, or enter the code manually.";
+"Camera / Scanner Unavailable" = "Camera / Scanner Unavailable";
+"Use NFC or enter the machine code manually." = "Use NFC or enter the machine code manually.";
+"NFC" = "NFC";
+"Enter Code" = "Enter Code";
+"Machine code (e.g. sscp)" = "Machine code (e.g. sscp)";
+"Find Machine" = "Find Machine";
+"Machine Found" = "Machine Found";
+"Start Training" = "Start Training";
+"Scan Another" = "Scan Another";
+"Machine Not Found" = "Machine Not Found";
+"Something Went Wrong" = "Something Went Wrong";
+"Try Again" = "Try Again";
+
+// MARK: - WorkoutDetailView
+
+"Synced to Apple Health" = "Synced to Apple Health";
+"Notes" = "Notes";
+"Date" = "Date";
+"Duration" = "Duration";
+"Total Volume" = "Total Volume";
+"Total Sets" = "Total Sets";
+"Exercises" = "Exercises";
+
+// MARK: - ExerciseLibraryView / ExerciseDetailView
+
+"Exercises" = "Exercises";
+"All" = "All";
+"Clear filters" = "Clear filters";
+"No matches" = "No matches";
+"Try a different muscle, equipment, or search term." = "Try a different muscle, equipment, or search term.";
+"Muscles" = "Muscles";
+"Primary" = "Primary";
+"Secondary" = "Secondary";
+"How to perform" = "How to perform";
+
+// MARK: - HealthAndCoachCards
+
+"Suggested Next Set" = "Suggested Next Set";
+"Recovery Notice" = "Recovery Notice";
+"Use This Set" = "Use This Set";
+"Heart Rate" = "Heart Rate";
+"Body Weight" = "Body Weight";
+"Active Energy" = "Active Energy";
+"Last Workout" = "Last Workout";
+
+// MARK: - WorkoutControls (RestTimerView)
+
+"Reset" = "Reset";
+"Skip Rest" = "Skip Rest";
+
+// MARK: - SurfaceCard / SectionHeader (used in MachineDetailView)
+
+"Preferred Settings" = "Preferred Settings";
+"Your saved adjustments" = "Your saved adjustments";
+"Last Session" = "Last Session";
+"History" = "History";
+
+// MARK: - Shared / EmptyState action titles
+
+"Create Plan" = "Create Plan";
+"Add Machine" = "Add Machine";
+"Add First Area" = "Add First Area";
+"Try Again" = "Try Again";

@@ -54,7 +54,7 @@ struct ExerciseSessionCard: View {
                 // Header
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(exercise.machineName)
+                        Text(LocalizedNames.machineName(exercise.machineName))
                             .font(.headline.weight(.bold))
                         if let tSets = exercise.targetSets {
                             Text("\(exercise.sets.count)/\(tSets) sets")

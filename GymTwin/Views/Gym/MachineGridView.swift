@@ -102,7 +102,7 @@ struct MachineGridView: View {
             .frame(height: 110)
 
             // Name
-            Text(machine.name)
+            Text(machine.localizedName)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(2)

@@ -29,6 +29,7 @@ struct ExerciseLibraryView: View {
             let equipmentOK = selectedEquipment.map { ex.equipment == $0 } ?? true
             let searchOK = searchText.isEmpty
                 || ex.name.localizedCaseInsensitiveContains(searchText)
+                || ex.localizedName.localizedCaseInsensitiveContains(searchText)
             return muscleOK && equipmentOK && searchOK
         }
     }
@@ -157,7 +158,7 @@ private struct ExerciseRow: View {
                 )
 
             VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                Text(exercise.name)
+                Text(exercise.localizedName)
                     .font(.headline)
                     .foregroundStyle(.primary)
                     .lineLimit(1)

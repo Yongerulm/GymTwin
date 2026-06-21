@@ -1,0 +1,426 @@
+/* ============================================================
+   GymTwin — Deutsch Localizable.strings
+   Schlüssel = exakter englischer Literal aus dem Quellcode.
+   ============================================================ */
+
+// MARK: - Tab-Leiste
+
+"Today" = "Heute";
+"Train" = "Training";
+"Progress" = "Fortschritt";
+"Profile" = "Profil";
+
+// MARK: - TodayView
+
+"Start training" = "Training starten";
+"Tap a plan — your weights load instantly" = "Plan antippen – Gewichte laden sofort";
+"Build your first plan in Train" = "Erstelle deinen ersten Plan unter Training";
+"Free session" = "Freies Training";
+"No plan — scan or add machines as you go" = "Kein Plan – Geräte scannen oder manuell hinzufügen";
+"Scan Machine" = "Gerät scannen";
+"QR · NFC · code — start in seconds" = "QR · NFC · Code – Training in Sekunden starten";
+"Resume workout" = "Training fortsetzen";
+"Up Next" = "Als Nächstes";
+"Based on your training history" = "Basierend auf deiner Trainingshistorie";
+"No Workouts Yet" = "Noch kein Training";
+"Start your first session and your training history will appear here." = "Starte deine erste Einheit – deine Trainingshistorie erscheint hier.";
+"Start Workout" = "Training starten";
+"Open Gym" = "Gym öffnen";
+"View Progress" = "Fortschritt anzeigen";
+"Health" = "Gesundheit";
+"From Apple Health" = "Aus Apple Health";
+"Recent Machines" = "Zuletzt genutzte Geräte";
+"Tap to start a set" = "Antippen zum Satz starten";
+"All" = "Alle";
+"Quick Actions" = "Schnellaktionen";
+"Session Logged" = "Einheit gespeichert";
+"Ready for today's workout" = "Bereit für das heutige Training";
+
+// MARK: - WorkoutsHubView
+
+"Workouts" = "Workouts";
+"Ready to train?" = "Bereit zum Training?";
+"Start an empty session, then scan a machine to load your weights instantly." = "Starte eine leere Einheit und scanne ein Gerät – deine Gewichte laden sofort.";
+"Start Workout" = "Training starten";
+"Your Gym" = "Dein Gym";
+"Browse areas and machines" = "Bereiche und Geräte durchsuchen";
+"Training Plans" = "Trainingspläne";
+"Build and pick your routine" = "Routine erstellen und auswählen";
+"Exercise Library" = "Übungsbibliothek";
+"1000+ exercises to explore" = "Mehr als 1000 Übungen entdecken";
+
+// MARK: - WorkoutFlowView
+
+"Choose your program" = "Programm wählen";
+"Follow a saved plan, or train freely and scan machines as you go." = "Folge einem gespeicherten Plan oder trainiere frei und scanne Geräte nach Bedarf.";
+"Free Training" = "Freies Training";
+"Build training plans in the Workouts tab to follow them here." = "Erstelle Trainingspläne unter Workouts, um sie hier zu nutzen.";
+"Scan a machine to begin" = "Gerät scannen zum Starten";
+"Hold your iPhone to a machine's NFC tag — its preferred weights load automatically, ready to adjust." = "Halte dein iPhone an den NFC-Tag des Geräts – deine bevorzugten Gewichte laden automatisch.";
+"Scan Machine" = "Gerät scannen";
+"Add manually" = "Manuell hinzufügen";
+"Work through your program" = "Programm durcharbeiten";
+"Today's readiness" = "Heutige Bereitschaft";
+"Take it lighter — drop a set each" = "Leichter angehen – je einen Satz weniger";
+"Feeling strong — add a set each" = "Stark drauf – je einen Satz mehr";
+"Add Machine" = "Gerät hinzufügen";
+"Rest Timer" = "Pause-Timer";
+"REST" = "PAUSE";
+"+15s" = "+15s";
+"Skip" = "Überspringen";
+"Discard" = "Verwerfen";
+"Finish" = "Beenden";
+"Machine detected" = "Gerät erkannt";
+"Machine code" = "Gerätecode";
+"NFC needs a real device — enter a machine code to test the flow." = "NFC benötigt ein echtes Gerät – Gerätecode eingeben zum Testen.";
+"Load" = "Laden";
+"Cancel" = "Abbrechen";
+"Finish Workout?" = "Training beenden?";
+"Save & Finish" = "Speichern & Beenden";
+"Discard Session" = "Einheit verwerfen";
+"Your session will be saved and synced to Health." = "Deine Einheit wird gespeichert und mit Health synchronisiert.";
+"Remove exercise?" = "Übung entfernen?";
+"Remove" = "Entfernen";
+"Keep" = "Behalten";
+"This removes the exercise and its logged sets from this session." = "Die Übung und alle protokollierten Sätze werden aus dieser Einheit entfernt.";
+"Plan complete — great work!" = "Plan abgeschlossen – großartig!";
+"Finish your workout, or add extra sets below." = "Beende dein Training oder füge weitere Sätze hinzu.";
+"Complete Set" = "Satz abschließen";
+
+// MARK: - WorkoutSetEntryView
+
+"Log Set" = "Satz protokollieren";
+"Weight" = "Gewicht";
+"Reps" = "Wdh.";
+
+// MARK: - ExerciseSessionCard / LoggedSetRow
+
+"Last session" = "Letzte Einheit";
+"Add Set" = "Satz hinzufügen";
+"Repeat" = "Wiederholen";
+"Log" = "Protokollieren";
+
+// MARK: - SessionSummaryView
+
+"Workout complete" = "Training abgeschlossen";
+"Done" = "Fertig";
+"Duration" = "Dauer";
+"Volume" = "Volumen";
+"Sets" = "Sätze";
+"Exercises" = "Übungen";
+"New Personal Records" = "Neue Bestleistungen";
+"Today you beat your best" = "Heute hast du deine Bestleistung übertroffen";
+"Keep the momentum — train again tomorrow." = "Bleib dran – trainiere morgen wieder.";
+
+// MARK: - WorkoutMachinePicker
+
+"Add Machine" = "Gerät hinzufügen";
+"No machines" = "Keine Geräte";
+"Add machines to your gym catalog first." = "Füge zuerst Geräte zum Gym-Katalog hinzu.";
+"Search machines or areas" = "Geräte oder Bereiche suchen";
+
+// MARK: - GymView
+
+"Search machines" = "Geräte suchen";
+"New Area" = "Neuer Bereich";
+"Area name (e.g. Chest, Back)" = "Bereichsname (z. B. Brust, Rücken)";
+"Add" = "Hinzufügen";
+"Give this muscle group or zone a name." = "Gib dieser Muskelgruppe oder Zone einen Namen.";
+"New Gym" = "Neues Gym";
+"Gym name (e.g. SRC, Home Gym)" = "Gym-Name (z. B. SRC, Heimgym)";
+"Add another gym you train in. You can switch any time." = "Füge ein weiteres Gym hinzu. Du kannst jederzeit wechseln.";
+"Add Machine" = "Gerät hinzufügen";
+"Add Area" = "Bereich hinzufügen";
+"Add Gym" = "Gym hinzufügen";
+"No Results" = "Keine Ergebnisse";
+"Build Your Gym" = "Dein Gym aufbauen";
+"Add areas (Chest, Back, Legs…) and then populate them with machines." = "Füge Bereiche (Brust, Rücken, Beine …) hinzu und befülle sie mit Geräten.";
+"Add First Area" = "Ersten Bereich hinzufügen";
+"No machines yet — tap to add one" = "Noch keine Geräte – antippen zum Hinzufügen";
+"Uncategorized" = "Ohne Kategorie";
+"Areas" = "Bereiche";
+"Machines" = "Geräte";
+"Configured" = "Konfiguriert";
+
+// MARK: - MachineGridView
+
+"No Machines" = "Keine Geräte";
+
+// MARK: - MachineDetailView
+
+"Preferred Settings" = "Bevorzugte Einstellungen";
+"Your saved adjustments" = "Deine gespeicherten Anpassungen";
+"Last Session" = "Letzte Einheit";
+"History" = "Verlauf";
+"Suggested Next Set" = "Vorgeschlagener nächster Satz";
+"Track Your Progress" = "Fortschritt verfolgen";
+"Start a workout on this machine to record sets and build your personal baseline." = "Starte ein Training an diesem Gerät, um Sätze aufzuzeichnen und deine persönliche Basis aufzubauen.";
+"Start Workout" = "Training starten";
+"Write NFC Tag" = "NFC-Tag beschreiben";
+"Hold near the tag…" = "An den Tag halten …";
+"Delete Machine" = "Gerät löschen";
+"Delete" = "Löschen";
+"Edit" = "Bearbeiten";
+
+// MARK: - MachineEditView
+
+"New Machine" = "Neues Gerät";
+"Edit Machine" = "Gerät bearbeiten";
+"Save" = "Speichern";
+"Add Photo" = "Foto hinzufügen";
+"Details" = "Details";
+"Machine name" = "Gerätename";
+"Category (e.g. Chest, Back, Legs)" = "Kategorie (z. B. Brust, Rücken, Beine)";
+"Notes" = "Notizen";
+"Gym Area" = "Gym-Bereich";
+"Area" = "Bereich";
+"None" = "Keiner";
+"New area name" = "Neuer Bereichsname";
+"Cancel New Area" = "Neuen Bereich abbrechen";
+"Add New Area" = "Neuen Bereich hinzufügen";
+"Settings" = "Einstellungen";
+"Store your personal machine adjustments: seat position, weight pin, handle height, etc." = "Speichere deine persönlichen Geräteeinstellungen: Sitzposition, Gewichtspin, Griffhöhe usw.";
+"Add Setting" = "Einstellung hinzufügen";
+"Label" = "Bezeichnung";
+"Value" = "Wert";
+"Name is required" = "Name ist erforderlich";
+
+// MARK: - PlansListView / PlanBuilderView
+
+"Training Plans" = "Trainingspläne";
+"No plans yet" = "Noch keine Pläne";
+"Build a plan from your machines — then just scan a machine to jump straight into it." = "Erstelle einen Plan aus deinen Geräten – dann einfach scannen und direkt einsteigen.";
+"Create Plan" = "Plan erstellen";
+"Suggest a plan with AI" = "Plan mit KI vorschlagen";
+"New Plan" = "Neuer Plan";
+"Edit Plan" = "Plan bearbeiten";
+"Plan name (e.g. Push Day)" = "Planname (z. B. Push-Tag)";
+"Base on an existing plan" = "Auf bestehenden Plan stützen";
+"Replace with another plan" = "Durch anderen Plan ersetzen";
+"Loads that plan's machines and targets so you can tweak them into a new plan." = "Lädt Geräte und Ziele des Plans, damit du sie in einen neuen Plan anpassen kannst.";
+"Add machines" = "Geräte hinzufügen";
+"Add Machines" = "Geräte hinzufügen";
+"Done" = "Fertig";
+"All added" = "Alle hinzugefügt";
+"Every machine in this gym is already in the plan." = "Alle Geräte dieses Gyms sind bereits im Plan.";
+"Apply to all plans?" = "Auf alle Pläne anwenden?";
+"Apply everywhere" = "Überall anwenden";
+"Only this plan" = "Nur dieser Plan";
+"Duplicate as new plan" = "Als neuen Plan duplizieren";
+"Delete Plan" = "Plan löschen";
+
+// MARK: - PlanGeneratorView
+
+"Training Plan" = "Trainingsplan";
+"Gym" = "Gym";
+"Goal" = "Ziel";
+"Days per week" = "Tage pro Woche";
+"Generating…" = "Wird generiert …";
+"Generate Plan" = "Plan generieren";
+"No Plan Yet" = "Noch kein Plan";
+"Choose your goal and weekly frequency above, then tap Generate Plan to get a personalised training schedule." = "Wähle oben dein Ziel und die Häufigkeit, dann tippe auf „Plan generieren“ für einen personalisierten Trainingsplan.";
+"Your Schedule" = "Dein Zeitplan";
+"Why this split?" = "Warum dieser Split?";
+"Target reps" = "Ziel-Wdh.";
+"Split" = "Split";
+"Rest or light cardio" = "Pause oder leichtes Cardio";
+"Select gym" = "Gym auswählen";
+
+// MARK: - ProgressDashboardView
+
+"Total Workouts" = "Einheiten gesamt";
+"Total Volume" = "Gesamtvolumen";
+"Weekly Goal" = "Wochenziel";
+"Streak" = "Serie";
+"Recovery" = "Erholung";
+"Readiness & muscle status" = "Bereitschaft & Muskelstatus";
+"AI Coach" = "KI-Coach";
+"On-device guidance" = "Coaching auf dem Gerät";
+"Steps" = "Schritte";
+"Sleep" = "Schlaf";
+"Resting HR" = "Ruhepuls";
+"VO₂ Max" = "VO₂ max";
+"Weekly Volume" = "Wochenvolumen";
+"Last 8 weeks" = "Letzte 8 Wochen";
+"No volume data yet" = "Noch keine Volumendaten";
+"Muscle Balance" = "Muskelbalance";
+"Volume by group" = "Volumen nach Muskelgruppe";
+"Personal Records" = "Bestleistungen";
+"Best set per machine" = "Bester Satz pro Gerät";
+"Insights" = "Erkenntnisse";
+"Keep It Up" = "Weiter so!";
+"Recent Sessions" = "Letzte Einheiten";
+"Last 20 workouts" = "Letzte 20 Trainings";
+"No Data Yet" = "Noch keine Daten";
+"Log your first workout to see analytics, personal records, and progress charts here." = "Protokolliere dein erstes Training, um Analysen, Bestleistungen und Fortschrittsgrafiken zu sehen.";
+"HRV" = "HRV";
+
+// MARK: - ProfileView
+
+"Your Focus" = "Dein Schwerpunkt";
+"Goal" = "Ziel";
+"Target reps" = "Ziel-Wdh.";
+"Sets" = "Sätze";
+"BMI" = "BMI";
+"Personal" = "Persönlich";
+"Name" = "Name";
+"Your name" = "Dein Name";
+"Training Goal" = "Trainingsziel";
+"Body Stats" = "Körperwerte";
+"Weight" = "Gewicht";
+"Height" = "Größe";
+"Add your body stats to unlock BMI tracking in the summary above." = "Füge deine Körperwerte hinzu, um die BMI-Anzeige oben freizuschalten.";
+
+// MARK: - SettingsView
+
+"Settings" = "Einstellungen";
+"Gym Twin" = "Gym Twin";
+"Your personal gym companion" = "Dein persönlicher Gym-Begleiter";
+"Apple Health" = "Apple Health";
+"Connect Apple Health" = "Apple Health verbinden";
+"Share workouts, body weight, and heart rate." = "Trainings, Körpergewicht und Herzfrequenz teilen.";
+"Requesting…" = "Wird angefragt …";
+"Authorize" = "Autorisieren";
+"Heart Rate" = "Herzfrequenz";
+"Body Weight" = "Körpergewicht";
+"Body Fat" = "Körperfettanteil";
+"Active Energy" = "Aktive Energie";
+"Auto" = "Automatisch";
+"Saved per workout" = "Pro Training gespeichert";
+"Refresh Metrics" = "Messwerte aktualisieren";
+"Workouts are saved to Apple Health automatically after authorization." = "Trainings werden nach der Autorisierung automatisch in Apple Health gespeichert.";
+"Apple Watch" = "Apple Watch";
+"Data" = "Daten";
+"Export Workouts" = "Trainings exportieren";
+"Save all workout data as JSON" = "Alle Trainingsdaten als JSON speichern";
+"Smart Recommendations" = "Smarte Empfehlungen";
+"Personalised set suggestions based on your history." = "Personalisierte Satzvorschläge basierend auf deiner Historie.";
+"Recommendations will appear during your workouts once enough training history is available." = "Empfehlungen erscheinen während des Trainings, sobald ausreichend Trainingshistorie vorliegt.";
+"Tools" = "Werkzeuge";
+"Build plans from your machines" = "Pläne aus deinen Geräten erstellen";
+"Goals, body metrics & training age" = "Ziele, Körperwerte & Trainingsalter";
+"Admin" = "Admin";
+"Machine catalog, sync & AI rules" = "Gerätekatalog, Sync & KI-Regeln";
+"About" = "Über";
+"Version" = "Version";
+"Offline-First" = "Offline-First";
+"All your data lives on-device. No account or cloud sync required." = "Alle Daten bleiben auf deinem Gerät. Kein Account oder Cloud-Sync erforderlich.";
+"Changes are saved automatically when you dismiss the keyboard." = "Änderungen werden automatisch gespeichert, wenn du die Tastatur schließt.";
+"Gym name" = "Gym-Name";
+"City, address…" = "Stadt, Adresse …";
+"Location" = "Standort";
+
+// MARK: - AdminPanelView
+
+"Machine Library" = "Gerätebibliothek";
+"QR / NFC Mapping" = "QR / NFC-Zuordnung";
+"How machine codes are encoded" = "Wie Gerätecodes kodiert werden";
+"QR URL Format" = "QR-URL-Format";
+"NFC NDEF Format" = "NFC-NDEF-Format";
+"Example URLs" = "Beispiel-URLs";
+"Sync" = "Synchronisierung";
+"Push catalog to OpenSearch" = "Katalog zu OpenSearch übertragen";
+"Syncing…" = "Wird synchronisiert …";
+"Sync to OpenSearch" = "Mit OpenSearch synchronisieren";
+"Set OPENSEARCH_URL in the environment to enable remote sync. The app works fully offline without it." = "Setze OPENSEARCH_URL in der Umgebung für Remote-Sync. Die App funktioniert auch vollständig offline.";
+"AI Rules" = "KI-Regeln";
+"Deterministic coach logic (read-only)" = "Deterministische Coach-Logik (nur Ansicht)";
+"Progressive Overload" = "Progressive Überlastung";
+"Deload Trigger" = "Deload-Auslöser";
+"Weight Rounding" = "Gewichtsrundung";
+"Progression Action" = "Progressionsaktion";
+"No Definitions" = "Keine Definitionen";
+"Tap + Add to create the first machine definition." = "Tippe auf + Hinzufügen, um die erste Gerätedefinition zu erstellen.";
+"Add Machine" = "Gerät hinzufügen";
+"Loading catalog…" = "Katalog wird geladen …";
+"Lock" = "Sperren";
+"Set Admin Passcode" = "Admin-Code festlegen";
+"Admin Access" = "Admin-Zugang";
+"Choose a 4-digit code to protect admin settings." = "Wähle einen 4-stelligen Code zum Schutz der Admin-Einstellungen.";
+"Enter your 4-digit admin code to continue." = "Gib deinen 4-stelligen Admin-Code ein, um fortzufahren.";
+"Tap here to enter code" = "Hier tippen zum Code eingeben";
+"Identity" = "Identität";
+"Muscles" = "Muskeln";
+"Comma-separated values" = "Kommagetrennte Werte";
+"Machine Code" = "Gerätecode";
+"Manufacturer" = "Hersteller";
+"Category" = "Kategorie";
+"Primary Muscles" = "Primäre Muskeln";
+"Secondary Muscles" = "Sekundäre Muskeln";
+"Movement Pattern" = "Bewegungsmuster";
+"Difficulty" = "Schwierigkeitsgrad";
+"Equipment Type" = "Gerätetyp";
+"Edit Definition" = "Definition bearbeiten";
+
+// MARK: - OnboardingView
+
+"Welcome to Gym Twin" = "Willkommen bei Gym Twin";
+"Your gym's digital twin. Build a plan once, then just train — your weights and targets are always one tap away." = "Der digitale Zwilling deines Gyms. Plan erstellen, dann einfach trainieren – Gewichte und Ziele immer einen Tap entfernt.";
+"Tap to load a machine" = "Antippen zum Gerät laden";
+"Hold your iPhone to a machine's NFC tag (or scan its code) and your predefined set loads instantly, ready to log." = "Halte dein iPhone an den NFC-Tag eines Geräts (oder scanne den Code) – dein vordefinierter Satz lädt sofort.";
+"Follow your plan" = "Plan befolgen";
+"Pick a plan, work through each machine, and Complete Set logs at your target and starts your rest. Progress tracks itself." = "Wähle einen Plan, arbeite jedes Gerät ab und tippe auf „Satz abschließen“ – dein Fortschritt wird automatisch erfasst.";
+"Next" = "Weiter";
+"Get Started" = "Loslegen";
+"Skip" = "Überspringen";
+
+// MARK: - ScanFlowView
+
+"Scan Machine" = "Gerät scannen";
+"Point at the QR code on the equipment, tap NFC, or enter the code manually." = "Auf den QR-Code des Geräts zeigen, NFC antippen oder Code manuell eingeben.";
+"Camera / Scanner Unavailable" = "Kamera / Scanner nicht verfügbar";
+"Use NFC or enter the machine code manually." = "NFC verwenden oder Gerätecode manuell eingeben.";
+"NFC" = "NFC";
+"Enter Code" = "Code eingeben";
+"Machine code (e.g. sscp)" = "Gerätecode (z. B. sscp)";
+"Find Machine" = "Gerät suchen";
+"Machine Found" = "Gerät gefunden";
+"Start Training" = "Training starten";
+"Scan Another" = "Weiteres scannen";
+"Machine Not Found" = "Gerät nicht gefunden";
+"Something Went Wrong" = "Etwas ist schiefgelaufen";
+"Try Again" = "Erneut versuchen";
+
+// MARK: - WorkoutDetailView
+
+"Synced to Apple Health" = "Mit Apple Health synchronisiert";
+"Notes" = "Notizen";
+"Date" = "Datum";
+"Duration" = "Dauer";
+"Total Volume" = "Gesamtvolumen";
+"Total Sets" = "Sätze gesamt";
+
+// MARK: - ExerciseLibraryView / ExerciseDetailView
+
+"Exercises" = "Übungen";
+"All" = "Alle";
+"Clear filters" = "Filter zurücksetzen";
+"No matches" = "Keine Treffer";
+"Try a different muscle, equipment, or search term." = "Anderen Muskel, Gerät oder Suchbegriff versuchen.";
+"Muscles" = "Muskeln";
+"Primary" = "Primär";
+"Secondary" = "Sekundär";
+"How to perform" = "So wird's ausgeführt";
+
+// MARK: - HealthAndCoachCards
+
+"Suggested Next Set" = "Vorgeschlagener nächster Satz";
+"Recovery Notice" = "Erholungshinweis";
+"Use This Set" = "Diesen Satz verwenden";
+"Heart Rate" = "Herzfrequenz";
+"Body Weight" = "Körpergewicht";
+"Active Energy" = "Aktive Energie";
+"Last Workout" = "Letztes Training";
+
+// MARK: - WorkoutControls (RestTimerView)
+
+"Reset" = "Zurücksetzen";
+"Skip Rest" = "Pause überspringen";
+
+// MARK: - Sprache / Settings (Nachtrag)
+"Language" = "Sprache";
+"App language" = "App-Sprache";
+"Switches the whole app — interface, exercises and machines." = "Stellt die ganze App um – Oberfläche, Übungen und Geräte.";
+"Restart required" = "Neustart erforderlich";
+"Quit and reopen Gym Twin to fully apply the language." = "Beende Gym Twin und öffne es neu, um die Sprache vollständig zu übernehmen.";
+"Build your first plan in Train" = "Erstelle deinen ersten Plan unter „Training“";

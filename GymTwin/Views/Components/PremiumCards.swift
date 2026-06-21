@@ -176,7 +176,7 @@ struct MachineCard: View {
 
                 // Text block
                 VStack(alignment: .leading, spacing: DS.Spacing.xs) {
-                    Text(name)
+                    Text(LocalizedNames.machineName(name))
                         .font(.headline)
                         .foregroundStyle(.primary)
                         .lineLimit(1)

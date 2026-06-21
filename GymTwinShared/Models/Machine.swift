@@ -12,6 +12,8 @@ import SwiftData
 final class Machine {
     @Attribute(.unique) var id: UUID
     var name: String
+    /// Name shown to the user, translated when the app language is German.
+    var localizedName: String { LocalizedNames.machineName(name) }
     var category: String
     var notes: String
     /// Optional machine photo. Stored outside the main store to keep the

@@ -21,7 +21,7 @@ struct ExerciseDetailView: View {
             .padding(.vertical, DS.Spacing.xl)
         }
         .background(GymBackground().ignoresSafeArea())
-        .navigationTitle(exercise.name)
+        .navigationTitle(exercise.localizedName)
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -38,7 +38,7 @@ struct ExerciseDetailView: View {
                     in: RoundedRectangle(cornerRadius: DS.Radius.lg, style: .continuous)
                 )
             VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                Text(exercise.name)
+                Text(exercise.localizedName)
                     .font(.title2.weight(.bold))
                 if !exercise.muscleSummary.isEmpty {
                     Text(exercise.muscleSummary)

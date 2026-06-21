@@ -15,6 +15,10 @@ struct SettingsView: View {
     @State private var exportItems: [Any] = []
     @State private var showingExportSheet = false
 
+    // Language override (English / Deutsch).
+    @AppStorage("app.language") private var appLanguage = "system"
+    @State private var showLanguageRestart = false
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -25,6 +29,7 @@ struct SettingsView: View {
                     gymSection
                     dataSection
                     aiCoachSection
+                    languageSection
                     toolsSection
                     aboutSection
                 }
@@ -34,6 +39,11 @@ struct SettingsView: View {
             .background(DS.Palette.background)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.large)
+        }
+        .alert("Restart required", isPresented: $showLanguageRestart) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Quit and reopen Gym Twin to fully apply the language.")
         }
         .task { model.bind(modelContext) }
         .sheet(isPresented: $showingExportSheet) {
@@ -484,6 +494,35 @@ struct SettingsView: View {
     }
 
     // MARK: - About
+
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.md) {
+            PremiumSectionHeader("Language", subtitle: "App language")
+            SurfaceCard {
+                VStack(alignment: .leading, spacing: DS.Spacing.sm) {
+                    Picker("Language", selection: $appLanguage) {
+                        Text("System").tag("system")
+                        Text("English").tag("en")
+                        Text("Deutsch").tag("de")
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: appLanguage) { _, newValue in applyLanguage(newValue) }
+                    Text("Switches the whole app — interface, exercises and machines.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private func applyLanguage(_ value: String) {
+        switch value {
+        case "en": UserDefaults.standard.set(["en"], forKey: "AppleLanguages")
+        case "de": UserDefaults.standard.set(["de"], forKey: "AppleLanguages")
+        default: UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        }
+        showLanguageRestart = true
+    }
 
     private var aboutSection: some View {
         VStack(spacing: DS.Spacing.md) {
