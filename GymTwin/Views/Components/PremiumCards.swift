@@ -49,7 +49,11 @@ struct HeroWorkoutCard: View {
     let lastSummary: String?
     /// Current training streak, shown as a flame pill when > 0.
     var streakDays: Int? = nil
-    let startAction: () -> Void
+    /// Today's readiness label (e.g. "Ready"); shown as a pill instead of START.
+    var readinessText: String? = nil
+    /// Optional START button. When nil (e.g. a launchpad sits below), the hero
+    /// is a clean motivational header without a competing call-to-action.
+    var startAction: (() -> Void)? = nil
 
     var body: some View {
         ZStack {
@@ -94,25 +98,36 @@ struct HeroWorkoutCard: View {
 
                 Spacer(minLength: DS.Spacing.lg)
 
-                // Bottom: dim stats + white START button
+                // Bottom: dim stats + readiness pill (or optional START button)
                 HStack(alignment: .bottom) {
                     Text(lastSummary ?? subtitle)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(.white.opacity(0.78))
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: DS.Spacing.md)
-                    Button(action: startAction) {
-                        HStack(spacing: 6) {
-                            Text("START").font(.system(size: 13, weight: .heavy))
-                            Image(systemName: "chevron.right").font(.system(size: 11, weight: .heavy))
+                    if let readinessText {
+                        HStack(spacing: 5) {
+                            Image(systemName: "bolt.heart.fill").font(.system(size: 10, weight: .bold))
+                            Text(readinessText).font(.system(size: 12, weight: .heavy))
                         }
-                        .foregroundStyle(Color(hex: "#C83400"))
-                        .padding(.horizontal, 20).padding(.vertical, 10)
-                        .background(.white.opacity(0.95), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 4)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12).padding(.vertical, 7)
+                        .background(.white.opacity(0.22), in: Capsule())
+                        .accessibilityLabel("Today's readiness: \(readinessText)")
+                    } else if let startAction {
+                        Button(action: startAction) {
+                            HStack(spacing: 6) {
+                                Text("START").font(.system(size: 13, weight: .heavy))
+                                Image(systemName: "chevron.right").font(.system(size: 11, weight: .heavy))
+                            }
+                            .foregroundStyle(Color(hex: "#C83400"))
+                            .padding(.horizontal, 20).padding(.vertical, 10)
+                            .background(.white.opacity(0.95), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .shadow(color: .black.opacity(0.18), radius: 8, x: 0, y: 4)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Start workout")
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Start workout")
                 }
             }
             .padding(18)

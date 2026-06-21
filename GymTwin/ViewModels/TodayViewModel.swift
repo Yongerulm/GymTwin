@@ -40,6 +40,10 @@ final class TodayViewModel {
     var activeEnergyKcal: Int?
     var lastWorkoutMinutes: Int?
 
+    /// Today's readiness (HRV + sleep led), shown as a hero preview.
+    var readiness: Int?
+    var readinessTitle: String?
+
     // MARK: - Aggregate statistics
 
     private(set) var statistics: TrainingStatistics = TrainingStatistics()
@@ -97,10 +101,22 @@ final class TodayViewModel {
 
         async let hr = hk.latestHeartRate()
         async let mass = hk.latestBodyMass()
+        async let hrvV = hk.latestHRV()
+        async let sleepV = hk.lastNightSleepHours()
+        async let restV = hk.restingHeartRate()
 
-        let (hrValue, massValue) = await (hr, mass)
+        let (hrValue, massValue, hrv, sleep, rest) = await (hr, mass, hrvV, sleepV, restV)
         heartRate = hrValue.map { Int($0.rounded()) }
         bodyWeightKg = massValue
+
+        let score = RecoveryService.readiness(
+            hrvMs: hrv,
+            restingHR: rest.map { Int($0.rounded()) },
+            sleepHours: sleep,
+            workoutsLast7Days: statistics.workoutsThisWeek
+        )
+        readiness = score
+        readinessTitle = ReadinessBand.from(score).title
     }
 
     // MARK: - Private helpers

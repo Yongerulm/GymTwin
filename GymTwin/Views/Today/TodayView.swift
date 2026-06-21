@@ -55,7 +55,7 @@ struct TodayView: View {
             dateText: model.dateText,
             lastSummary: model.lastSummary.map { "Last time: \($0)" },
             streakDays: model.statistics.currentStreakDays,
-            startAction: { router.startWorkout() }
+            readinessText: model.readinessTitle
         )
     }
 
