@@ -175,7 +175,7 @@ struct PlanBuilderView: View {
                 Section("Machines") {
                     ForEach($items) { $item in
                         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                            Text(item.machineName).font(.body.weight(.semibold))
+                            Text(LocalizedNames.machineName(item.machineName)).font(.body.weight(.semibold))
                             Stepper("Sets \(item.sets)", value: $item.sets, in: 1...12)
                                 .font(.caption)
                             Stepper("Reps \(item.reps)", value: $item.reps, in: 1...50)
@@ -249,7 +249,7 @@ struct PlanBuilderView: View {
                     ))
                 } label: {
                     HStack {
-                        Text(machine.name)
+                        Text(machine.localizedName)
                         Spacer()
                         Image(systemName: "plus.circle").foregroundStyle(DS.Palette.accent)
                     }

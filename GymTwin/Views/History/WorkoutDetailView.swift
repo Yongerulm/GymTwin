@@ -177,7 +177,7 @@ private struct ExerciseDetailCard: View {
                                     in: RoundedRectangle(cornerRadius: DS.Radius.sm, style: .continuous))
                         .accessibilityHidden(true)
 
-                    Text(exercise.machineName)
+                    Text(LocalizedNames.machineName(exercise.machineName))
                         .font(.headline)
                         .foregroundStyle(.primary)
                         .lineLimit(1)

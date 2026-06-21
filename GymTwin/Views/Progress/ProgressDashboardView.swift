@@ -526,7 +526,7 @@ private struct PRProgressRow: View {
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: DS.Spacing.xxs) {
-                Text(machineName)
+                Text(LocalizedNames.machineName(machineName))
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                 Text(formattedBest)

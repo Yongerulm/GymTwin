@@ -140,7 +140,7 @@ private struct MachinePickerRow: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(machine.name)
+                    Text(machine.localizedName)
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.primary)
                     if !machine.category.isEmpty {

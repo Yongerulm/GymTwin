@@ -433,7 +433,7 @@ private struct RecentMachineChip: View {
                 Image(systemName: muscleSymbol)
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(.white)
-                Text(ref.name)
+                Text(LocalizedNames.machineName(ref.name))
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(.white)
                     .lineLimit(2)

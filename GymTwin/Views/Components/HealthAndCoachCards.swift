@@ -123,7 +123,7 @@ struct SuggestedSetCard: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Text(machineName)
+                Text(LocalizedNames.machineName(machineName))
                     .font(.headline)
 
                 // Big weight × reps
