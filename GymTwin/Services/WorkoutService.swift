@@ -113,6 +113,21 @@ struct WorkoutService {
         return stats
     }
 
+    /// Cheap stats for frequent screens (Today): counts, this-week and streak.
+    /// Skips the totalSets/totalVolume aggregation, which would fault every set
+    /// of every workout into memory on the main thread and stall the UI.
+    func lightStatistics() -> TrainingStatistics {
+        let workouts = allWorkouts()
+        var stats = TrainingStatistics()
+        stats.totalWorkouts = workouts.count
+        let calendar = Calendar.current
+        if let weekStart = calendar.dateInterval(of: .weekOfYear, for: Date())?.start {
+            stats.workoutsThisWeek = workouts.filter { $0.date >= weekStart }.count
+        }
+        stats.currentStreakDays = currentStreak(workouts: workouts, calendar: calendar)
+        return stats
+    }
+
     /// Counts consecutive calendar days (ending today or yesterday) with at
     /// least one workout.
     private func currentStreak(workouts: [Workout], calendar: Calendar) -> Int {

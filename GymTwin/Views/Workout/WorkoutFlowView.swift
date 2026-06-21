@@ -216,9 +216,10 @@ struct WorkoutFlowView: View {
     private func finishWithSummary() {
         guard let workout = model.finish() else { router.endWorkout(); return }
         let service = WorkoutService(context: modelContext)
-        // Volume change vs the previous saved workout.
-        let history = service.allWorkouts()
-        let previous = history.first { $0.id != workout.id }
+        // Bounded, cheap reads only — never fetch/aggregate ALL workouts here
+        // (that loads every set on the main thread and stalls the finish).
+        let recent = service.recentWorkouts(limit: 60)
+        let previous = recent.first { $0.id != workout.id }
         let delta: Double? = {
             guard let prevVol = previous?.totalVolume, prevVol > 0 else { return nil }
             return (workout.totalVolume - prevVol) / prevVol * 100
@@ -230,8 +231,27 @@ struct WorkoutFlowView: View {
             totalVolume: workout.totalVolume,
             volumeDeltaPercent: delta,
             newPRs: [],
-            streakDays: service.statistics().currentStreakDays
+            streakDays: currentStreak(from: recent.map(\.date))
         )
+    }
+
+    /// Cheap streak from recent workout dates (no set loading): consecutive
+    /// calendar days with a workout, ending today or yesterday.
+    private func currentStreak(from dates: [Date]) -> Int {
+        let cal = Calendar.current
+        let days = Set(dates.map { cal.startOfDay(for: $0) }).sorted(by: >)
+        guard let first = days.first else { return 0 }
+        let today = cal.startOfDay(for: Date())
+        guard (cal.dateComponents([.day], from: first, to: today).day ?? 99) <= 1 else { return 0 }
+        var streak = 1
+        var prev = first
+        for day in days.dropFirst() {
+            let gap = cal.dateComponents([.day], from: day, to: prev).day ?? 0
+            if gap == 1 { streak += 1; prev = day }
+            else if gap == 0 { continue }
+            else { break }
+        }
+        return streak
     }
 
     // MARK: - Program selection (first step of Start Workout)

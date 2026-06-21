@@ -71,7 +71,9 @@ final class TodayViewModel {
         guard let context else { return }
 
         let service = WorkoutService(context: context)
-        statistics = service.statistics()
+        // Cheap stats only (Today shows streak/week/count) — avoids loading
+        // every set on the main thread on each appear.
+        statistics = service.lightStatistics()
 
         let recent = service.recentWorkouts(limit: 5)
         lastWorkout = recent.first
